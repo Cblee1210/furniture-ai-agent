@@ -67,11 +67,7 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
 </section>
 
 <section id="sales" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">ORCHESTRATOR</div><h1>Sales Agent</h1><div class="workspace">
-<div class="panel"><h2 data-zh="客户询盘" data-en="Customer Inquiry">客户询盘</h2><textarea id="inq">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
-<input id="apiBase" value="http://127.0.0.1:8000" style="margin:0" aria-label="Backend API">
-<span id="apiState" class="badge soon">API OFFLINE</span>
-</div>
-<button class="btn primary" onclick="runRealSalesAgent()">Run AI Sales Agent</button></div>
+<div class="panel"><h2 data-zh="客户询盘" data-en="Customer Inquiry">客户询盘</h2><textarea id="inq">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><button class="btn primary" onclick="runRealSalesAgent()">Run AI Sales Agent</button></div>
 <div class="panel"><h2 data-zh="实时编排结果" data-en="Live Orchestration">实时编排结果</h2><div id="sout" class="output">Waiting for inquiry...</div></div>
 <div class="panel"><h2 data-zh="审批控制" data-en="Approval Control">审批控制</h2><div class="kv"><div class="k">Product facts</div><div class="v">Auto</div><div class="k">Final price</div><div class="v">Human approval</div><div class="k">HS / Duty / VAT</div><div class="v">Authoritative source + review</div><div class="k">Contract commitment</div><div class="v">Human approval</div></div></div>
 <div class="panel"><h2 data-zh="回复草稿" data-en="Reply Draft">回复草稿</h2><div id="smail" class="output">Run the agent to generate a draft.</div><div class="sep"><button class="btn primary">Approve</button> <button class="btn secondary">Human Review</button></div></div>
@@ -189,48 +185,70 @@ window.setLanguage=setLanguage;
 function go(id,b){document.querySelectorAll('.page').forEach(e=>e.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelectorAll('.nav button').forEach(e=>e.classList.remove('on'));if(b)b.classList.add('on');window.scrollTo(0,0)}
 function setRole(){let r=document.getElementById('role').value;document.getElementById('main').classList.toggle('restricted',r!=='employee');}
 
+function getApiBase(){
+  const manual=(document.getElementById('apiBase')?.value||'').trim().replace(/\/$/,'');
+  if(manual) return manual;
+  return window.AGENT_API_BASE || '';
+}
+async function checkApi(){
+  const state=document.getElementById('apiState'); if(!state) return;
+  const base=getApiBase();
+  if(!base){ state.textContent='API NOT SET'; return; }
+  try{
+    const r=await fetch(base+'/health');
+    state.textContent=r.ok?'API ONLINE':'API ERROR';
+  }catch(e){ state.textContent='API OFFLINE'; }
+}
 async function runRealSalesAgent(){
- const out=document.getElementById('sout'), mail=document.getElementById('smail');
- const state=document.getElementById('apiState');
- out.textContent=L==='zh'?'正在调用 Sales Agent...':'Calling Sales Agent...';
- mail.textContent=L==='zh'?'等待智能体生成...':'Waiting for agent...';
- try{
-   const base=document.getElementById('apiBase').value.replace(/\/$/,'');
-   const r=await fetch(base+'/api/sales-agent',{
-     method:'POST',headers:{'Content-Type':'application/json'},
-     body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
-   });
-   if(!r.ok) throw new Error(await r.text());
-   const d=await r.json();
-   state.textContent='API ONLINE'; state.className='badge';
-   const i=d.intent||{}, calls=(d.tool_calls||[]).join(' → ');
-   out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}
+  const out=document.getElementById('sout'), mail=document.getElementById('smail');
+  const state=document.getElementById('apiState');
+  const base=getApiBase();
+  if(!base){
+    if(state) state.textContent='API NOT SET';
+    out.textContent=L==='zh'
+      ?'尚未配置云端后端地址。部署 Render 后，把 HTTPS 地址填入上方 Backend API URL。'
+      :'Backend API is not configured. After Render deployment, paste the HTTPS URL above.';
+    return;
+  }
+  out.textContent=L==='zh'?'正在调用真实 Sales Agent...':'Calling real Sales Agent...';
+  mail.textContent=L==='zh'?'正在生成客户回复...':'Generating customer reply...';
+  try{
+    const r=await fetch(base+'/api/sales-agent',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json(); if(state) state.textContent='API ONLINE';
+    const i=d.intent||{};
+    out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}
 Customer: ${i.customer_type||'—'}
 Country: ${i.country||'—'}
 Product: ${i.product||'—'}
 Quantity: ${i.quantity??'—'}
 Incoterm: ${i.incoterm||'—'}
 Destination: ${i.destination||'—'}
+Fabric: ${i.fabric_requirement||'—'}
+Documents: ${i.document_requirement||'—'}
 
-${L==='zh'?'【工具调用】':'[TOOL CALLS]'}
-${calls||'—'}
+${L==='zh'?'【Agent Routing】':'[AGENT ROUTING]'}
+${(d.tool_calls||[]).join(' → ')||'—'}
 
-${L==='zh'?'【产品检索】':'[PRODUCT]'}
+${L==='zh'?'【Product Knowledge】':'[PRODUCT KNOWLEDGE]'}
 ${d.product_summary||'—'}
 
-${L==='zh'?'【报价】':'[QUOTATION]'}
+${L==='zh'?'【Quotation】':'[QUOTATION]'}
 ${d.quotation_summary||'—'}
 
-${L==='zh'?'【贸易风险】':'[TRADE RISK]'}
+${L==='zh'?'【Trade & Logistics Risk】':'[TRADE & LOGISTICS RISK]'}
 ${(d.risks||[]).map(x=>'• '+x).join('\n')||'—'}
 
-${L==='zh'?'【审批状态】':'[APPROVAL]'}
+${L==='zh'?'【Human-in-the-loop】':'[HUMAN-IN-THE-LOOP]'}
 ${d.approval_required?'HUMAN APPROVAL REQUIRED':'AUTO'}`;
-   mail.textContent=d.reply_draft||'—';
- }catch(e){
-   state.textContent='API OFFLINE'; state.className='badge soon';
-   out.textContent=(L==='zh'?'后端暂未连接。\n请先启动 backend 服务。\n\n错误：':'Backend is not connected.\nStart the backend service first.\n\nError: ')+e.message;
- }
+    mail.textContent=d.reply_draft||'—';
+  }catch(e){
+    if(state) state.textContent='API OFFLINE';
+    out.textContent=(L==='zh'?'Sales Agent 后端连接失败：':'Sales Agent backend connection failed: ')+e.message;
+  }
 }
 
 function sales(){document.getElementById('sout').textContent=`1  INTENT ROUTER\n✓ B2B showroom buyer · Türkiye · 2 samples · CIF\n\n2  PRODUCT KNOWLEDGE AGENT\n✓ Compression sofa · high-elastic fabric · test document request\n\n3  QUOTATION AGENT\n✓ Sample quotation structure prepared\n\n4  TRADE & LOGISTICS AGENT\n⚠ Consignee / tax ID / customs capability requires verification\n\n5  RISK GATE\n⚠ Price + HS + duty/VAT + binding commitment → HUMAN APPROVAL`;
@@ -325,5 +343,10 @@ function trade(){document.getElementById('tout').textContent=`1. Consignee / imp
 function follow(){document.getElementById('fout').textContent=`SIGNAL\nStage: Sample quotation · Silence: 7 days\nPriority: Medium-High\n\nNEXT BEST ACTION\nFollow up today without immediate discounting. Ask whether product, fabric, logistics or internal approval is blocking progress.\n\nDRAFT\nDear Customer,\nJust following up on the sample quotation and fabric options shared earlier. Please let us know if additional product, logistics or certification information would support your internal evaluation.\nBest regards,\nExport Sales Team`;}
 function knowledge(){let q=document.getElementById('kb').value.toLowerCase(),a=q.includes('warranty')?'Retrieved → Standard warranty: 3 years; final scope subject to contract.':q.includes('recover')?'Retrieved → Full recovery is generally expected within 24–72 hours depending on product and environment.':q.includes('fire')?'Retrieved → Applicable fire-retardant documentation can be provided; exact report must match the ordered configuration.':q.includes('carton')?'Retrieved → Demo carton: 50 × 50 × 100 cm; 31 kg gross/ctn.':(q.includes('fabric')||q.includes('elastic'))?'Retrieved → High-elasticity fabric is available for the demo compression-sofa configuration; final color/material combination requires production confirmation.':'No sufficiently grounded evidence retrieved → Factory confirmation required.';document.getElementById('kout').textContent=`QUERY\n${document.getElementById('kb').value}\n\n${a}\n\nSource: Enterprise knowledge retrieval (demo)`;}
 setLanguage('zh');setRole();refreshFX();
+</script>
+<script>
+// After Render deployment, set this once to your backend HTTPS URL.
+// Example: window.AGENT_API_BASE = "https://your-service.onrender.com";
+window.AGENT_API_BASE = window.AGENT_API_BASE || "";
 </script>
 </body></html>
