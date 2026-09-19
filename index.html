@@ -2,177 +2,328 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>XX家具制造商 · AI Agent Center</title>
+<title>XX家具制造商 · AI Agent Center Lite V1.0</title>
 <style>
-:root{--bg:#f5f5f3;--ink:#171717;--muted:#71717a;--line:#e4e4e7;--card:#fff;--dark:#18181b;--soft:#f4f4f5;--good:#166534;--warn:#9a3412}
-*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
-.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#111113;color:#fff;padding:26px 18px;position:sticky;top:0;height:100vh}
-.brand{font-size:18px;font-weight:800;margin:0 8px 6px}.brand2{font-size:11px;color:#a1a1aa;margin:0 8px 28px;line-height:1.5}
-.nav button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#d4d4d8;padding:11px 12px;border-radius:9px;margin:4px 0;cursor:pointer;font-size:13px}.nav button:hover,.nav button.active{background:#27272a;color:#fff}
-.main{padding:34px;max-width:1500px;width:100%}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#71717a}.hero h1{font-size:36px;margin:8px 0 8px}.hero p{color:var(--muted);margin:0;max-width:760px;line-height:1.65}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}.stat,.card,.panel{background:#fff;border:1px solid var(--line);border-radius:15px}.stat{padding:16px}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.agent{padding:18px;cursor:pointer;transition:.15s}.agent:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.06)}.agent h3{margin:12px 0 6px;font-size:16px}.agent p{font-size:12.5px;color:var(--muted);line-height:1.55;min-height:58px}.tag{display:inline-block;font-size:10px;padding:4px 7px;border-radius:999px;background:#ecfdf5;color:#166534}.soon{background:#f4f4f5;color:#71717a}
-.icon{font-size:20px}.page{display:none}.page.active{display:block}
-.back{border:0;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;margin-bottom:18px}
-.workspace{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{padding:18px}.panel h2{font-size:15px;margin:0 0 13px}
-textarea,input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;background:#fcfcfc;font:inherit;margin:5px 0 10px}textarea{min-height:190px;resize:vertical}
-.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer}.primary{background:#18181b;color:#fff}.secondary{background:#eeeef0;color:#18181b}
-.kv{display:grid;grid-template-columns:145px 1fr;gap:8px 10px;font-size:13px}.k{color:var(--muted)}.v{font-weight:650}.sep{border-top:1px solid var(--line);margin:16px 0;padding-top:16px}
-.flow{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0}.flow span{font-size:11px;background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:999px}.arrow{color:#a1a1aa!important;border:0!important;background:transparent!important;padding:8px 0!important}
-.output{white-space:pre-wrap;background:#fafafa;border:1px solid var(--line);border-radius:10px;padding:13px;font-size:12.5px;line-height:1.65;min-height:150px}
-.notice{padding:11px;border-radius:10px;font-size:12px;line-height:1.55;background:#fff7ed;color:var(--warn)}.good{background:#f0fdf4;color:var(--good)}
-table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
-.langbar{display:flex;gap:6px;margin:0 8px 20px}.langbtn{flex:1;border:1px solid #3f3f46;background:#18181b;color:#a1a1aa;border-radius:8px;padding:7px;cursor:pointer;font-size:11px}.langbtn.on{background:#fff;color:#18181b;border-color:#fff}
-.footer{font-size:11px;color:#8b8b94;margin-top:25px;line-height:1.6}
-@media(max-width:1000px){.shell{grid-template-columns:1fr}.side{height:auto;position:relative}.nav{display:flex;overflow:auto}.nav button{min-width:130px}.stats,.cards{grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}}
-@media(max-width:620px){.main{padding:20px}.stats,.cards{grid-template-columns:1fr}.hero h1{font-size:28px}}
+:root{--bg:#f6f7f8;--card:#fff;--ink:#17181b;--muted:#70747c;--line:#e5e7eb;--dark:#17181b;--green:#18745b;--amber:#a35b10;--blue:#315ea8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#151619;color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh}
+.logo{font-weight:800;font-size:18px;margin:4px 8px}.sublogo{font-size:10px;letter-spacing:.11em;color:#8d929c;margin:7px 8px 22px;line-height:1.5}
+.lang,.role{display:flex;gap:5px;margin:0 7px 12px}.mini{flex:1;border:1px solid #3a3d43;background:#1d1f23;color:#aeb3bc;border-radius:8px;padding:7px 5px;font-size:10px;cursor:pointer}.mini.on{background:#fff;color:#17181b;border-color:#fff}
+.role{display:block}.role select{width:100%;background:#1d1f23;color:#fff;border:1px solid #3a3d43;border-radius:8px;padding:9px;font-size:11px}
+.nav{margin-top:20px}.nav button{display:block;width:100%;border:0;background:transparent;color:#c9ccd2;text-align:left;padding:11px;border-radius:9px;margin:3px 0;cursor:pointer}.nav button:hover,.nav button.on{background:#292b30;color:#fff}
+.main{padding:30px;max-width:1500px;width:100%}.page{display:none}.page.on{display:block}.topbar{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#8b8f96}.topbar h1{font-size:31px;margin:7px 0}.desc{color:var(--muted);font-size:13px;line-height:1.65;max-width:820px}
+.status{background:#ecfdf5;color:#166534;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:700;white-space:nowrap}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}.metric,.card,.panel{background:#fff;border:1px solid var(--line);border-radius:14px}.metric{padding:15px}.metric b{font-size:20px;display:block}.metric span{font-size:10px;color:var(--muted)}
+.orch{padding:18px;margin:14px 0}.orch-title{display:flex;justify-content:space-between;align-items:center}.orch-title b{font-size:13px}.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:15px}.node{padding:9px 11px;border:1px solid var(--line);background:#fafafa;border-radius:9px;font-size:10px}.node.hot{background:#17181b;color:#fff}.arr{color:#aaa;font-size:11px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.agent{padding:17px;cursor:pointer;transition:.15s}.agent:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.06)}.agent .ico{font-size:19px}.agent h3{font-size:15px;margin:10px 0 5px}.agent p{font-size:11.5px;color:var(--muted);line-height:1.55;min-height:53px}.badge{display:inline-block;font-size:9px;font-weight:700;padding:4px 7px;border-radius:999px;background:#edf8f3;color:#176b55}.soon{background:#f2f2f3;color:#777}
+.workspace{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:16px}.panel{padding:17px}.panel h2{font-size:13px;margin:0 0 13px}.back{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 11px;cursor:pointer;margin-bottom:16px}
+textarea,input,select{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fcfcfc;font:inherit;font-size:12px;margin:4px 0 9px}textarea{min-height:175px;resize:vertical}.btn{border:0;border-radius:8px;padding:9px 12px;font-weight:700;font-size:11px;cursor:pointer}.primary{background:#17181b;color:#fff}.secondary{background:#eceef0;color:#17181b}.output{white-space:pre-wrap;background:#fafafa;border:1px solid var(--line);border-radius:9px;padding:12px;font-size:11.5px;line-height:1.65;min-height:145px}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:7px 10px;font-size:11.5px}.k{color:var(--muted)}.v{font-weight:650}.sep{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
+.notice{padding:10px;border-radius:9px;background:#fff7ed;color:#9a3412;font-size:11px;line-height:1.55}.good{background:#effaf5;color:#166534}
+table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
+.access{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.access .card{padding:16px}.access h3{font-size:13px;margin:0 0 10px}.check{font-size:11px;line-height:1.8;color:#50545b}
+.casebar{background:#eef2f7;border:1px solid #dde3eb;border-radius:10px;padding:10px 12px;font-size:11px;margin:14px 0;color:#45505f}.footer{font-size:10px;color:#90949b;margin-top:22px;line-height:1.6}
+.hidden-cost{transition:.2s}.restricted .hidden-cost{filter:blur(5px);user-select:none}.restricted .internal-only{display:none}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.side{height:auto;position:relative}.nav{display:flex;overflow:auto}.nav button{min-width:125px}.metrics,.cards,.access{grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}}
+@media(max-width:620px){.main{padding:18px}.metrics,.cards,.access{grid-template-columns:1fr}.topbar h1{font-size:25px}}
 </style>
 </head>
 <body>
-<div class="shell">
+<div class="app">
 <aside class="side">
- <div class="brand">XX家具制造商</div><div class="brand2">AI AGENT CENTER<br>B2B Export & Manufacturing Operations</div>
- <div class="langbar"><button id="zhBtn" class="langbtn on" onclick="setLang('zh')">中文</button><button id="enBtn" class="langbtn" onclick="setLang('en')">EN</button></div>
+ <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · LITE V1.0<br>B2B EXPORT & MANUFACTURING</div>
+ <div class="lang"><button type="button" id="zbtn" class="mini on" onclick="setLanguage('zh'); return false;">中文</button><button type="button" id="ebtn" class="mini" onclick="setLanguage('en'); return false;">EN</button></div>
+ <div id="langState" style="font-size:9px;color:#8d929c;margin:0 8px 8px">Language: 中文</div><div class="role"><select id="role" onchange="setRole()"><option value="employee">企业员工 / Employee</option><option value="agent">海外代理商 / Overseas Agent</option><option value="partner">合作伙伴 / Partner</option></select></div>
  <div class="nav">
-  <button class="active" onclick="show('home',this)">⌂ <span data-zh="智能体中心" data-en="Agent Center">智能体中心</span></button>
-  <button onclick="show('sales',this)">◎ <span data-zh="销售智能体" data-en="Sales Agent">销售智能体</span></button>
-  <button onclick="show('quote',this)">¥ <span data-zh="报价智能体" data-en="Quotation Agent">报价智能体</span></button>
-  <button onclick="show('trade',this)">⇄ <span data-zh="贸易与物流" data-en="Trade & Logistics">贸易与物流</span></button>
-  <button onclick="show('follow',this)">◷ <span data-zh="客户跟进" data-en="Follow-up Agent">客户跟进</span></button>
-  <button onclick="show('knowledge',this)">◇ <span data-zh="产品知识库" data-en="Product Knowledge">产品知识库</span></button>
+  <button class="on" onclick="go('home',this)">⌂ <span data-zh="智能体中心" data-en="Agent Center">智能体中心</span></button>
+  <button onclick="go('sales',this)">◎ <span data-zh="销售智能体" data-en="Sales Agent">销售智能体</span></button>
+  <button onclick="go('quote',this)">¥ <span data-zh="报价智能体" data-en="Quotation Agent">报价智能体</span></button>
+  <button onclick="go('trade',this)">⇄ <span data-zh="贸易与物流" data-en="Trade & Logistics">贸易与物流</span></button>
+  <button onclick="go('follow',this)">◷ <span data-zh="客户跟进" data-en="Follow-up">客户跟进</span></button>
+  <button onclick="go('knowledge',this)">◇ <span data-zh="产品知识库" data-en="Knowledge">产品知识库</span></button>
+  <button onclick="go('access',this)">⌘ <span data-zh="角色与权限" data-en="Roles & Access">角色与权限</span></button>
  </div>
 </aside>
-<main class="main">
 
-<section id="home" class="page active">
- <div class="hero"><div class="eyebrow">Manufacturing AI Prototype · V0.2</div><h1>AI Agent Center</h1>
- <p><span data-zh="面向家具制造企业海外 B2B 业务的轻量多智能体原型。通过企业知识、业务规则、外部工具与人工审批，将询盘、报价、贸易物流和客户跟进连接成可执行工作流。" data-en="A lightweight multi-agent prototype for furniture manufacturers and global B2B partners. It connects inquiries, quotations, trade logistics and customer follow-up through enterprise knowledge, business rules, external tools and human approval.">面向家具制造企业海外 B2B 业务的轻量多智能体原型。通过企业知识、业务规则、外部工具与人工审批，将询盘、报价、贸易物流和客户跟进连接成可执行工作流。</span></p></div>
- <div class="stats"><div class="stat"><b>5</b><span>Active Agents</span></div><div class="stat"><b>2</b><span>Planned Agents</span></div><div class="stat"><b>RAG</b><span>Enterprise Knowledge</span></div><div class="stat"><b>HITL</b><span>Human-in-the-loop</span></div></div>
- <div class="flow"><span>Customer Inquiry</span><span class="arrow">→</span><span>Intent Router</span><span class="arrow">→</span><span>Knowledge / Pricing / Trade Tools</span><span class="arrow">→</span><span>Decision Support</span><span class="arrow">→</span><span>Human Approval</span></div>
+<main id="main" class="main">
+<section id="home" class="page on">
+ <div class="topbar"><div><div class="eyebrow">Manufacturing AI · Multi-Agent Prototype</div><h1>AI Agent Center</h1><div class="desc" data-zh="面向家具制造企业及全球合作伙伴的多智能体业务平台。通过 Agent 编排，将企业知识、报价规则、物流与贸易信息、CRM 跟进和人工审批连接为完整业务闭环。" data-en="A multi-agent business platform for furniture manufacturers and global partners. Agent orchestration connects enterprise knowledge, quotation rules, logistics & trade intelligence, CRM follow-up and human approval into one operational loop.">面向家具制造企业及全球合作伙伴的多智能体业务平台。通过 Agent 编排，将企业知识、报价规则、物流与贸易信息、CRM 跟进和人工审批连接为完整业务闭环。</div></div><div class="status">● DEMO ONLINE</div></div>
+ <div class="casebar"><b data-zh="统一演示案例：" data-en="Shared demo case:">统一演示案例：</b> <span data-zh="海外展厅客户采购 2 件压缩沙发样品，要求 CIF Mersin、高弹面料及阻燃检测资料。" data-en="An overseas showroom buyer requests 2 compression-sofa samples, CIF Mersin, high-elastic fabric and fire-retardant documentation.">海外展厅客户采购 2 件压缩沙发样品，要求 CIF Mersin、高弹面料及阻燃检测资料。</span></div>
+ <div class="card" style="padding:14px 17px;margin:16px 0">
+<div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+<div><b style="font-size:12px" data-zh="运行状态" data-en="Runtime Status">运行状态</b>
+<div style="font-size:10px;color:#70747c;margin-top:5px" data-zh="静态前端可直接运行 · 实时汇率联网读取 · 业务规则本地执行" data-en="Static front end runs directly · Live FX online · Business rules execute locally">静态前端可直接运行 · 实时汇率联网读取 · 业务规则本地执行</div></div>
+<span class="badge">RUNNABLE LITE</span></div></div><div class="metrics"><div class="metric"><b>5</b><span>RUNNABLE AGENTS</span></div><div class="metric"><b>3</b><span>ROLE PROFILES</span></div><div class="metric"><b>RAG</b><span>KNOWLEDGE LAYER</span></div><div class="metric"><b>HITL</b><span>APPROVAL CONTROL</span></div></div>
+ <div class="card orch"><div class="orch-title"><b data-zh="Agent Orchestration · 智能体编排" data-en="Agent Orchestration">Agent Orchestration · 智能体编排</b><span class="badge">ORCHESTRATOR</span></div><div class="flow"><span class="node hot">Customer Inquiry</span><span class="arr">→</span><span class="node">Intent Router</span><span class="arr">→</span><span class="node">Product RAG</span><span class="arr">↔</span><span class="node">Quotation</span><span class="arr">↔</span><span class="node">Trade Tools</span><span class="arr">→</span><span class="node">Risk Gate</span><span class="arr">→</span><span class="node hot">Human Approval</span></div></div>
  <div class="cards">
-  <div class="card agent" onclick="show('sales')"><div class="icon">◎</div><h3>Sales Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="识别海外客户意图，编排产品、报价与贸易能力，形成下一步销售动作和回复草稿。" data-en="Understands overseas buyer intent, orchestrates product, quotation and trade capabilities, and recommends the next sales action with a reply draft.">识别海外客户意图，编排产品、报价与贸易能力，形成下一步销售动作和回复草稿。</span></p></div>
-  <div class="card agent" onclick="show('quote')"><div class="icon">¥</div><h3>Quotation Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="基于SKU、数量、包装和贸易条款辅助生成 EXW / FOB / CIF / DDP 报价结构。" data-en="Builds EXW / FOB / CIF / DDP quotation structures based on SKU, quantity, packaging and commercial terms.">基于SKU、数量、包装和贸易条款辅助生成 EXW / FOB / CIF / DDP 报价结构。</span></p></div>
-  <div class="card agent" onclick="show('trade')"><div class="icon">⇄</div><h3>Trade & Logistics Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="比较运输方案，识别清关、税费、进口主体与目的国贸易风险，并要求权威数据核验。" data-en="Compares shipping options and identifies customs, tax, importer and destination-market risks with authoritative-data verification.">比较运输方案，识别清关、税费、进口主体与目的国贸易风险，并要求权威数据核验。</span></p></div>
-  <div class="card agent" onclick="show('follow')"><div class="icon">◷</div><h3>Customer Follow-up Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="根据客户阶段、最后联系时间和历史动作生成跟进优先级与下一步沟通建议。" data-en="Uses opportunity stage, last-contact time and interaction history to prioritize follow-up and recommend the next best action.">根据客户阶段、最后联系时间和历史动作生成跟进优先级与下一步沟通建议。</span></p></div>
-  <div class="card agent" onclick="show('knowledge')"><div class="icon">◇</div><h3>Product Knowledge Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="模拟企业RAG知识库，对产品、面料、包装、质保、认证和恢复时间进行检索式问答。" data-en="Simulates an enterprise RAG knowledge base for grounded Q&A across products, fabrics, packaging, warranty, compliance and recovery guidance.">模拟企业RAG知识库，对产品、面料、包装、质保、认证和恢复时间进行检索式问答。</span></p></div>
-  <div class="card agent"><div class="icon">✦</div><h3>Marketing & SEO Agent</h3><span class="tag soon">COMING SOON</span><p><span data-zh="从产品资料自动生成B2B产品页、SEO元数据、社媒内容和销售素材。" data-en="Generates B2B product pages, SEO metadata, social content and sales assets from product information.">从产品资料自动生成B2B产品页、SEO元数据、社媒内容和销售素材。</span></p></div>
-  <div class="card agent"><div class="icon">▦</div><h3>Management Insight Agent</h3><span class="tag soon">COMING SOON</span><p><span data-zh="未来连接CRM/ERP/网站数据，回答询盘、转化、产品热度和客户跟进等经营问题。" data-en="Future integration with CRM, ERP and web data for management insights across leads, conversion, product demand and follow-up.">未来连接CRM/ERP/网站数据，回答询盘、转化、产品热度和客户跟进等经营问题。</span></p></div>
+  <div class="card agent" onclick="go('sales')"><div class="ico">◎</div><h3>Sales Agent</h3><span class="badge">ACTIVE</span><p data-zh="识别询盘意图并调用产品、报价、贸易能力，输出下一步行动和客户回复。" data-en="Understands buyer intent and orchestrates product, quotation and trade capabilities to produce next actions and customer replies.">识别询盘意图并调用产品、报价、贸易能力，输出下一步行动和客户回复。</p></div>
+  <div class="card agent" onclick="go('quote')"><div class="ico">¥</div><h3>Quotation Agent</h3><span class="badge">ACTIVE</span><p data-zh="根据SKU、数量、包装、物流和 Incoterm 生成结构化报价，并设置审批边界。" data-en="Builds structured quotations from SKU, quantity, packaging, logistics and Incoterms with approval boundaries.">根据SKU、数量、包装、物流和 Incoterm 生成结构化报价，并设置审批边界。</p></div>
+  <div class="card agent" onclick="go('trade')"><div class="ico">⇄</div><h3>Trade & Logistics Agent</h3><span class="badge">ACTIVE</span><p data-zh="比较运输方式，识别清关、税费、进口主体和目的国贸易风险。" data-en="Compares shipping modes and identifies customs, tax, importer and destination-market risks.">比较运输方式，识别清关、税费、进口主体和目的国贸易风险。</p></div>
+  <div class="card agent" onclick="go('follow')"><div class="ico">◷</div><h3>Follow-up Agent</h3><span class="badge">ACTIVE</span><p data-zh="结合CRM阶段、联系时间与历史动作，推荐 Next Best Action。" data-en="Uses CRM stage, contact timing and history to recommend the Next Best Action.">结合CRM阶段、联系时间与历史动作，推荐 Next Best Action。</p></div>
+  <div class="card agent" onclick="go('knowledge')"><div class="ico">◇</div><h3>Product Knowledge Agent</h3><span class="badge">ACTIVE</span><p data-zh="模拟企业RAG知识库，回答产品、材料、包装、认证、质保等问题。" data-en="Simulates enterprise RAG for grounded answers on products, materials, packaging, compliance and warranty.">模拟企业RAG知识库，回答产品、材料、包装、认证、质保等问题。</p></div>
+  <div class="card agent"><div class="ico">✦</div><h3>Marketing Agent</h3><span class="badge soon">ROADMAP</span><p data-zh="产品资料自动生成B2B页面、SEO、社媒和代理商营销素材。" data-en="Generates B2B pages, SEO, social and distributor marketing assets from product data.">产品资料自动生成B2B页面、SEO、社媒和代理商营销素材。</p></div>
  </div>
- <div class="footer"><span data-zh="匿名化演示环境：不包含真实制造商、品牌或客户身份。当前版本用于验证 Agent 场景、流程与交互；实时税率、库存、运价等生产数据需通过授权API或企业系统获取。" data-en="Anonymized demo environment: no real manufacturer, brand or customer identity is included. This prototype validates agent scenarios, workflows and interactions; real-time tariffs, inventory and freight rates require authorized APIs or enterprise systems.">匿名化演示环境：不包含真实制造商、品牌或客户身份。当前版本用于验证 Agent 场景、流程与交互；实时税率、库存、运价等生产数据需通过授权API或企业系统获取。</span></div>
+ <div class="footer" data-zh="匿名化原型：不包含真实制造商、品牌或客户身份。实时税率、库存、运价及正式商务承诺须连接授权数据源并经过人工审批。" data-en="Anonymized prototype: no real manufacturer, brand or customer identity is included. Live tariffs, inventory, freight rates and binding commercial commitments require authorized data sources and human approval.">匿名化原型：不包含真实制造商、品牌或客户身份。实时税率、库存、运价及正式商务承诺须连接授权数据源并经过人工审批。</div>
 </section>
 
-<section id="sales" class="page">
- <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Orchestrator Agent</div><h1>Sales Agent</h1>
- <div class="flow"><span>Inquiry</span><span class="arrow">→</span><span>Intent</span><span class="arrow">→</span><span>Knowledge</span><span class="arrow">→</span><span>Quotation</span><span class="arrow">→</span><span>Trade</span><span class="arrow">→</span><span>Human Review</span></div>
- <div class="workspace">
-  <div class="panel"><h2>Customer Inquiry</h2><textarea id="salesInput">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><button class="btn primary" onclick="salesRun()">Run Agent</button></div>
-  <div class="panel"><h2>Agent Analysis</h2><div id="salesOut" class="output">Waiting for inquiry...</div></div>
-  <div class="panel"><h2>Agent Routing</h2><div class="kv"><div class="k">Knowledge Agent</div><div class="v">Product / Fabric / Certification</div><div class="k">Quotation Agent</div><div class="v">Sample price / Incoterm</div><div class="k">Trade Agent</div><div class="v">CIF / Customs / Tax risk</div><div class="k">Approval</div><div class="v">Required before external commitment</div></div></div>
-  <div class="panel"><h2>Generated Reply</h2><div id="salesMail" class="output">Run the agent to generate a draft.</div><div class="sep"><button class="btn primary" onclick="alert('Demo: approved. Production version would create a CRM/email draft.')">Approve Draft</button> <button class="btn secondary" onclick="alert('Escalated to human sales manager.')">Human Review</button></div></div>
- </div>
-</section>
+<section id="sales" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">ORCHESTRATOR</div><h1>Sales Agent</h1><div class="workspace">
+<div class="panel"><h2 data-zh="客户询盘" data-en="Customer Inquiry">客户询盘</h2><textarea id="inq">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+<input id="apiBase" value="http://127.0.0.1:8000" style="margin:0" aria-label="Backend API">
+<span id="apiState" class="badge soon">API OFFLINE</span>
+</div>
+<button class="btn primary" onclick="runRealSalesAgent()">Run AI Sales Agent</button></div>
+<div class="panel"><h2 data-zh="实时编排结果" data-en="Live Orchestration">实时编排结果</h2><div id="sout" class="output">Waiting for inquiry...</div></div>
+<div class="panel"><h2 data-zh="审批控制" data-en="Approval Control">审批控制</h2><div class="kv"><div class="k">Product facts</div><div class="v">Auto</div><div class="k">Final price</div><div class="v">Human approval</div><div class="k">HS / Duty / VAT</div><div class="v">Authoritative source + review</div><div class="k">Contract commitment</div><div class="v">Human approval</div></div></div>
+<div class="panel"><h2 data-zh="回复草稿" data-en="Reply Draft">回复草稿</h2><div id="smail" class="output">Run the agent to generate a draft.</div><div class="sep"><button class="btn primary">Approve</button> <button class="btn secondary">Human Review</button></div></div>
+</div></section>
 
-<section id="quote" class="page">
- <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Business Rule Agent</div><h1>Quotation Agent</h1>
- <div class="workspace">
-  <div class="panel"><h2>Quotation Inputs</h2>
-   <label>Quantity</label><input id="qty" type="number" value="2">
-   <label>EXW unit price (RMB)</label><input id="exw" type="number" value="1260">
-   <label>Incoterm</label><select id="term"><option>EXW</option><option>FOB</option><option selected>CIF</option><option>DDP</option></select>
-   <label>Estimated logistics/export charges (RMB)</label><input id="logi" type="number" value="1266">
-   <button class="btn primary" onclick="quoteRun()">Generate Structure</button>
-  </div>
-  <div class="panel"><h2>Pricing Decision Support</h2><div id="quoteOut" class="output">Waiting for inputs...</div></div>
- </div>
- <div class="panel" style="margin-top:14px"><div class="notice"><b>Control:</b> Demo calculates a quotation structure only. Margin policy, final freight, insurance, duty/VAT and contractual commitments require authorized data and human approval.</div></div>
-</section>
+<section id="quote" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">BUSINESS RULE AGENT</div><h1>Quotation Agent</h1><div class="workspace">
+<div class="panel"><h2 data-zh="报价参数" data-en="Quotation Inputs">报价参数</h2><label>Quantity</label><input id="qty" type="number" value="2"><label>EXW / unit (RMB)</label><input id="exw" class="hidden-cost" type="number" value="1260"><label>Incoterm</label><select id="term"><option>EXW</option><option>FOB</option><option selected>CIF</option><option>DDP</option></select><label>Logistics / Export charges (RMB)</label><input id="lg" class="hidden-cost" type="number" value="1266">
+<label data-zh="报价币种" data-en="Quote Currency">报价币种</label>
+<select id="currency" onchange="quote()"><option value="CNY">CNY ¥</option><option value="USD" selected>USD $</option><option value="EUR">EUR €</option></select>
+<div style="display:flex;gap:7px;align-items:center;margin:5px 0 10px">
+  <button class="btn secondary" onclick="refreshFX()" type="button" data-zh="刷新实时汇率" data-en="Refresh FX">刷新实时汇率</button>
+  <span id="fxstatus" style="font-size:10px;color:#70747c">FX: loading...</span>
+</div>
+<button class="btn primary" onclick="quote()">Generate</button></div>
+<div class="panel"><h2 data-zh="报价决策支持" data-en="Pricing Decision Support">报价决策支持</h2><div id="qout" class="output">Waiting for inputs...</div></div></div>
+<div class="panel" style="margin-top:13px">
+<div class="kv">
+  <div class="k" data-zh="汇率数据源" data-en="FX Source">汇率数据源</div><div class="v">Frankfurter API · official/central-bank sources</div>
+  <div class="k" data-zh="基准币种" data-en="Base Currency">基准币种</div><div class="v">CNY</div>
+  <div class="k">CNY → USD</div><div class="v" id="usdRate">Loading...</div>
+  <div class="k">CNY → EUR</div><div class="v" id="eurRate">Loading...</div>
+  <div class="k" data-zh="数据日期" data-en="Rate Date">数据日期</div><div class="v" id="fxdate">—</div>
+</div>
+<div class="sep"><div class="notice" data-zh="汇率用于报价辅助，不代表银行实际结算价。正式商业报价建议保留汇率有效期或设置汇率缓冲。" data-en="FX rates are for quotation support and may differ from bank settlement rates. Formal quotations should include an FX validity period or pricing buffer.">汇率用于报价辅助，不代表银行实际结算价。正式商业报价建议保留汇率有效期或设置汇率缓冲。</div></div>
+</div>
+<div class="panel internal-only" style="margin-top:13px"><div class="notice"><b>Internal control:</b> Cost, margin and final commercial price are employee-only data. Overseas roles receive authorized selling/agent price only.</div></div></section>
 
-<section id="trade" class="page">
- <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">External Tool Agent</div><h1>Trade & Logistics Agent</h1>
- <div class="workspace">
-  <div class="panel"><h2>Shipment</h2><div class="kv"><div class="k">Destination</div><div class="v">Mersin, Türkiye</div><div class="k">Cartons</div><div class="v">2</div><div class="k">Carton Size</div><div class="v">50 × 50 × 100 cm</div><div class="k">Gross Weight</div><div class="v">62 kg</div><div class="k">Requested Term</div><div class="v">CIF</div></div><div class="sep"><button class="btn primary" onclick="tradeRun()">Assess Trade Risk</button></div></div>
-  <div class="panel"><h2>Agent Assessment</h2><div id="tradeOut" class="output">Waiting for assessment...</div></div>
-  <div class="panel"><h2>Shipping Options</h2><table><tr><th>Mode</th><th>Use Case</th><th>Status</th></tr><tr><td>Sea LCL</td><td>Cost-oriented sample shipment</td><td>Compare</td></tr><tr><td>Express</td><td>Time-oriented samples</td><td>Compare</td></tr><tr><td>Air Freight</td><td>Urgent / larger samples</td><td>Optional</td></tr></table></div>
-  <div class="panel"><h2>Production Data Sources</h2><div class="kv"><div class="k">HS / Tariff</div><div class="v">Customs / official trade source</div><div class="k">Freight</div><div class="v">Forwarder API / quotation</div><div class="k">FX</div><div class="v">Authorized rate source</div><div class="k">Customer</div><div class="v">CRM / tax ID / consignee data</div></div></div>
- </div>
-</section>
+<section id="trade" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">TOOL-ENABLED AGENT</div><h1>Trade & Logistics Agent</h1><div class="workspace">
+<div class="panel"><h2 data-zh="运输任务" data-en="Shipment Task">运输任务</h2><div class="kv"><div class="k">Destination</div><div class="v">Mersin, Türkiye</div><div class="k">Shipment</div><div class="v">2 cartons / 62 kg</div><div class="k">Carton</div><div class="v">50 × 50 × 100 cm</div><div class="k">Incoterm</div><div class="v">CIF</div></div><div class="sep"><button class="btn primary" onclick="trade()">Assess Risk</button></div></div>
+<div class="panel"><h2 data-zh="风险评估" data-en="Risk Assessment">风险评估</h2><div id="tout" class="output">Waiting for assessment...</div></div>
+<div class="panel"><h2 data-zh="生产环境工具" data-en="Production Tools">生产环境工具</h2><table><tr><th>Tool</th><th>Purpose</th></tr><tr><td>Customs / Trade Source</td><td>HS, duty, VAT, restrictions</td></tr><tr><td>Forwarder API</td><td>Live freight / schedule</td></tr><tr><td>CRM</td><td>Consignee / tax ID / history</td></tr><tr><td>FX Source</td><td>Authorized exchange rate</td></tr></table></div>
+<div class="panel"><h2>Guardrail</h2><div class="notice">LLM memory is not treated as an authoritative tariff or customs source. High-risk trade decisions are escalated to human review.</div></div>
+</div></section>
 
-<section id="follow" class="page">
- <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">CRM Agent</div><h1>Customer Follow-up Agent</h1>
- <div class="workspace">
-  <div class="panel"><h2>Opportunity Snapshot</h2><div class="kv"><div class="k">Customer</div><div class="v">Overseas Buyer #001</div><div class="k">Stage</div><div class="v">Sample Quotation</div><div class="k">Last Action</div><div class="v">Quotation + fabric options sent</div><div class="k">Last Contact</div><div class="v">7 days ago</div><div class="k">Response</div><div class="v">No reply</div></div><div class="sep"><button class="btn primary" onclick="followRun()">Recommend Action</button></div></div>
-  <div class="panel"><h2>Next Best Action</h2><div id="followOut" class="output">Waiting for CRM analysis...</div></div>
- </div>
-</section>
+<section id="follow" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">CRM AGENT</div><h1>Customer Follow-up Agent</h1><div class="workspace">
+<div class="panel"><h2 data-zh="商机快照" data-en="Opportunity Snapshot">商机快照</h2><div class="kv"><div class="k">Customer</div><div class="v">Overseas Buyer #001</div><div class="k">Stage</div><div class="v">Sample Quotation</div><div class="k">Last action</div><div class="v">Quote + fabrics sent</div><div class="k">Silence</div><div class="v">7 days</div></div><div class="sep"><button class="btn primary" onclick="follow()">Recommend Action</button></div></div>
+<div class="panel"><h2>Next Best Action</h2><div id="fout" class="output">Waiting for CRM analysis...</div></div></div></section>
 
-<section id="knowledge" class="page">
- <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Enterprise RAG Prototype</div><h1>Product Knowledge Agent</h1>
- <div class="workspace">
-  <div class="panel"><h2>Ask Enterprise Knowledge</h2><input id="kbq" value="Can this compression sofa use high-elastic fabric?"><button class="btn primary" onclick="kbRun()">Retrieve & Answer</button><div class="sep"><small style="color:#71717a">Try: warranty / recovery / fire-retardant / carton / fabric</small></div></div>
-  <div class="panel"><h2>RAG Answer</h2><div id="kbOut" class="output">Waiting for query...</div></div>
-  <div class="panel"><h2>Knowledge Sources</h2><table><tr><th>Collection</th><th>Examples</th></tr><tr><td>Product Master</td><td>SKU, dimensions, CBM, weight</td></tr><tr><td>Materials</td><td>Chenille, bouclé, high-elastic fabric</td></tr><tr><td>Commercial</td><td>MOQ, lead time, warranty</td></tr><tr><td>Compliance</td><td>Test reports, certification</td></tr></table></div>
-  <div class="panel"><h2>RAG Guardrail</h2><div class="notice">If knowledge retrieval has insufficient evidence, the agent should answer “factory confirmation required” rather than fabricate product or compliance facts.</div></div>
- </div>
-</section>
+<section id="knowledge" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">ENTERPRISE RAG</div><h1>Product Knowledge Agent</h1><div class="workspace">
+<div class="panel"><h2 data-zh="查询企业知识" data-en="Ask Enterprise Knowledge">查询企业知识</h2><input id="kb" value="Can this compression sofa use high-elastic fabric?"><button class="btn primary" onclick="knowledge()">Retrieve & Answer</button><div class="sep"><small>Try: warranty / recovery / fire-retardant / carton / fabric</small></div></div>
+<div class="panel"><h2>RAG Answer</h2><div id="kout" class="output">Waiting for query...</div></div>
+<div class="panel"><h2 data-zh="知识集合" data-en="Knowledge Collections">知识集合</h2><table><tr><th>Collection</th><th>Data</th></tr><tr><td>Product Master</td><td>SKU / size / CBM / weight</td></tr><tr><td>Materials</td><td>Fabric / color / compatibility</td></tr><tr><td>Commercial</td><td>MOQ / lead time / warranty</td></tr><tr><td>Compliance</td><td>Test reports / certification</td></tr></table></div>
+<div class="panel"><h2>Anti-Hallucination</h2><div class="good notice">Insufficient retrieval evidence → “Factory confirmation required.” The agent does not invent product or compliance facts.</div></div>
+</div></section>
 
+<section id="access" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">RBAC · ROLE-BASED ACCESS CONTROL</div><h1 data-zh="角色与权限" data-en="Roles & Access">角色与权限</h1><div class="desc" data-zh="同一套 Agent 能力根据用户身份展示不同数据与操作权限，支持企业内部、海外代理商和合作伙伴协同。" data-en="The same agent capabilities expose different data and actions according to user identity, supporting internal teams, overseas agents and partners.">同一套 Agent 能力根据用户身份展示不同数据与操作权限，支持企业内部、海外代理商和合作伙伴协同。</div>
+<div class="access">
+<div class="card"><h3>Enterprise Employee</h3><div class="check">✓ Product knowledge<br>✓ Internal EXW / cost<br>✓ Logistics data<br>✓ CRM history<br>✓ Quotation approval<br>✓ Trade-risk review</div></div>
+<div class="card"><h3>Overseas Agent</h3><div class="check">✓ Product knowledge<br>✓ Authorized agent price<br>✓ Marketing materials<br>✓ Logistics support<br>— Internal cost / margin<br>— Final factory approval</div></div>
+<div class="card"><h3>Business Partner</h3><div class="check">✓ Shared product knowledge<br>✓ Project-specific quotation<br>✓ Logistics collaboration<br>✓ Documentation<br>— Internal CRM history<br>— Cost / margin data</div></div>
+</div><div class="panel" style="margin-top:13px"><div class="notice" data-zh="演示提示：使用左侧角色下拉框切换身份。代理商/合作伙伴模式会隐藏或模糊内部成本数据，模拟真实企业权限隔离。" data-en="Demo tip: switch identity from the role selector in the sidebar. Agent/Partner modes hide or blur internal cost data to simulate enterprise access isolation.">演示提示：使用左侧角色下拉框切换身份。代理商/合作伙伴模式会隐藏或模糊内部成本数据，模拟真实企业权限隔离。</div></div></section>
 </main></div>
 <script>
-
-let currentLang='zh';
-const titleMap={
- zh:{home:'AI Agent Center',sales:'Sales Agent',quote:'Quotation Agent',trade:'Trade & Logistics Agent',follow:'Customer Follow-up Agent',knowledge:'Product Knowledge Agent'},
- en:{home:'AI Agent Center',sales:'Sales Agent',quote:'Quotation Agent',trade:'Trade & Logistics Agent',follow:'Customer Follow-up Agent',knowledge:'Product Knowledge Agent'}
+let L='zh';
+const UI={
+ zh:{
+  employee:'企业员工 / Employee',agent:'海外代理商 / Overseas Agent',partner:'合作伙伴 / Partner',
+  run:'运行智能体',generate:'生成报价',refresh:'刷新实时汇率',approve:'批准',review:'人工审核',
+  waitingInquiry:'等待客户询盘...',waitingInput:'等待报价参数...',waitingAssessment:'等待风险评估...',
+  waitingCRM:'等待CRM分析...',waitingQuery:'等待知识查询...',
+  qty:'数量',currency:'报价币种',logistics:'物流/出口费用（人民币）',
+  source:'汇率数据源',base:'基准币种',rateDate:'数据日期'
+ },
+ en:{
+  employee:'Enterprise Employee',agent:'Overseas Agent',partner:'Business Partner',
+  run:'Run Agent',generate:'Generate Quote',refresh:'Refresh FX',approve:'Approve',review:'Human Review',
+  waitingInquiry:'Waiting for inquiry...',waitingInput:'Waiting for inputs...',waitingAssessment:'Waiting for assessment...',
+  waitingCRM:'Waiting for CRM analysis...',waitingQuery:'Waiting for query...',
+  qty:'Quantity',currency:'Quote Currency',logistics:'Logistics / Export Charges (RMB)',
+  source:'FX Source',base:'Base Currency',rateDate:'Rate Date'
+ }
 };
-function setLang(lang){
- currentLang=lang;
- document.documentElement.lang=lang==='zh'?'zh-CN':'en';
- document.getElementById('zhBtn').classList.toggle('on',lang==='zh');
- document.getElementById('enBtn').classList.toggle('on',lang==='en');
- document.querySelectorAll('[data-zh][data-en]').forEach(el=>el.textContent=el.dataset[lang]);
- // Translate common interface labels without changing business data
- const dict={
-  'Customer Inquiry':['客户询盘','Customer Inquiry'],'Agent Analysis':['智能体分析','Agent Analysis'],
-  'Agent Routing':['智能体路由','Agent Routing'],'Generated Reply':['自动生成回复','Generated Reply'],
-  'Quotation Inputs':['报价输入','Quotation Inputs'],'Pricing Decision Support':['报价决策支持','Pricing Decision Support'],
-  'Shipment':['运输信息','Shipment'],'Agent Assessment':['智能体评估','Agent Assessment'],
-  'Shipping Options':['运输方案','Shipping Options'],'Production Data Sources':['生产数据源','Production Data Sources'],
-  'Opportunity Snapshot':['商机概览','Opportunity Snapshot'],'Next Best Action':['下一步最佳行动','Next Best Action'],
-  'Ask Enterprise Knowledge':['查询企业知识库','Ask Enterprise Knowledge'],'RAG Answer':['RAG 检索回答','RAG Answer'],
-  'Knowledge Sources':['知识来源','Knowledge Sources'],'RAG Guardrail':['RAG 安全边界','RAG Guardrail']
- };
- document.querySelectorAll('h2').forEach(el=>{
-   for(const [en,[zhv,env]] of Object.entries(dict)){
-     if(el.textContent===en||el.textContent===zhv) el.textContent=lang==='zh'?zhv:env;
-   }
+function setLanguage(x){
+ L=x;
+ document.documentElement.lang=x==='zh'?'zh-CN':'en';
+ document.getElementById('zbtn').classList.toggle('on',x==='zh');
+ document.getElementById('ebtn').classList.toggle('on',x==='en');
+ const ls=document.getElementById('langState'); if(ls) ls.textContent=x==='zh'?'Language: 中文':'Language: English';
+ document.querySelectorAll('[data-zh][data-en]').forEach(e=>e.textContent=e.dataset[x]);
+
+ // role selector
+ const rs=document.getElementById('role');
+ rs.options[0].textContent=UI[x].employee; rs.options[1].textContent=UI[x].agent; rs.options[2].textContent=UI[x].partner;
+
+ // Back buttons
+ document.querySelectorAll('.back').forEach(e=>e.textContent=x==='zh'?'← 返回智能体中心':'← Agent Center');
+
+ // Action buttons
+ document.querySelectorAll('button.primary').forEach(e=>{
+   const fn=e.getAttribute('onclick')||'';
+   if(fn.includes('sales()')) e.textContent=UI[x].run;
+   else if(fn.includes('quote()')) e.textContent=UI[x].generate;
+   else if(fn.includes('trade()')) e.textContent=x==='zh'?'评估贸易风险':'Assess Trade Risk';
+   else if(fn.includes('follow()')) e.textContent=x==='zh'?'推荐下一步行动':'Recommend Action';
+   else if(fn.includes('knowledge()')) e.textContent=x==='zh'?'检索并回答':'Retrieve & Answer';
+   else if(e.textContent==='Approve'||e.textContent==='批准') e.textContent=UI[x].approve;
  });
- document.querySelectorAll('.back').forEach(el=>el.textContent=lang==='zh'?'← 返回智能体中心':'← Agent Center');
+ document.querySelectorAll('button.secondary').forEach(e=>{
+   if((e.getAttribute('onclick')||'').includes('refreshFX')) e.textContent=UI[x].refresh;
+   else if(e.textContent==='Human Review'||e.textContent==='人工审核') e.textContent=UI[x].review;
+ });
+
+ // Labels that were originally English-only
+ const labels=document.querySelectorAll('label');
+ labels.forEach(el=>{
+   const t=el.textContent.trim();
+   if(['Quantity','数量'].includes(t)) el.textContent=UI[x].qty;
+   if(['Logistics / Export charges (RMB)','物流/出口费用（人民币）'].includes(t)) el.textContent=UI[x].logistics;
+ });
+
+ // Re-render dynamic areas in selected language when they already contain output
+ if(document.getElementById('qout') && !document.getElementById('qout').textContent.includes('Waiting')) quote();
+}
+window.setLanguage=setLanguage;
+function go(id,b){document.querySelectorAll('.page').forEach(e=>e.classList.remove('on'));document.getElementById(id).classList.add('on');document.querySelectorAll('.nav button').forEach(e=>e.classList.remove('on'));if(b)b.classList.add('on');window.scrollTo(0,0)}
+function setRole(){let r=document.getElementById('role').value;document.getElementById('main').classList.toggle('restricted',r!=='employee');}
+
+async function runRealSalesAgent(){
+ const out=document.getElementById('sout'), mail=document.getElementById('smail');
+ const state=document.getElementById('apiState');
+ out.textContent=L==='zh'?'正在调用 Sales Agent...':'Calling Sales Agent...';
+ mail.textContent=L==='zh'?'等待智能体生成...':'Waiting for agent...';
+ try{
+   const base=document.getElementById('apiBase').value.replace(/\/$/,'');
+   const r=await fetch(base+'/api/sales-agent',{
+     method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
+   });
+   if(!r.ok) throw new Error(await r.text());
+   const d=await r.json();
+   state.textContent='API ONLINE'; state.className='badge';
+   const i=d.intent||{}, calls=(d.tool_calls||[]).join(' → ');
+   out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}
+Customer: ${i.customer_type||'—'}
+Country: ${i.country||'—'}
+Product: ${i.product||'—'}
+Quantity: ${i.quantity??'—'}
+Incoterm: ${i.incoterm||'—'}
+Destination: ${i.destination||'—'}
+
+${L==='zh'?'【工具调用】':'[TOOL CALLS]'}
+${calls||'—'}
+
+${L==='zh'?'【产品检索】':'[PRODUCT]'}
+${d.product_summary||'—'}
+
+${L==='zh'?'【报价】':'[QUOTATION]'}
+${d.quotation_summary||'—'}
+
+${L==='zh'?'【贸易风险】':'[TRADE RISK]'}
+${(d.risks||[]).map(x=>'• '+x).join('\n')||'—'}
+
+${L==='zh'?'【审批状态】':'[APPROVAL]'}
+${d.approval_required?'HUMAN APPROVAL REQUIRED':'AUTO'}`;
+   mail.textContent=d.reply_draft||'—';
+ }catch(e){
+   state.textContent='API OFFLINE'; state.className='badge soon';
+   out.textContent=(L==='zh'?'后端暂未连接。\n请先启动 backend 服务。\n\n错误：':'Backend is not connected.\nStart the backend service first.\n\nError: ')+e.message;
+ }
 }
 
-function show(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo(0,0)}
-function salesRun(){
- let t=document.getElementById('salesInput').value.toLowerCase();
- let country=(t.includes('türkiye')||t.includes('turkey'))?'Türkiye':'Needs detection';
- let term=t.includes('cif')?'CIF':t.includes('ddp')?'DDP':t.includes('fob')?'FOB':'Needs confirmation';
- document.getElementById('salesOut').textContent=`INTENT CLASSIFICATION\n• Market: ${country}\n• Buyer: B2B / showroom buyer\n• Intent: Sample order + quotation\n• Quantity: 2 pcs\n• Incoterm: ${term}\n• Requirements: high-elastic fabric, fire-retardant report\n\nAGENT ROUTING\n✓ Product Knowledge Agent\n✓ Quotation Agent\n✓ Trade & Logistics Agent\n\nRISK GATE\nFinal price, tax/duty, HS classification and delivery commitment → HUMAN APPROVAL`;
- document.getElementById('salesMail').textContent=`Dear Purchasing Team,\n\nThank you for your inquiry. We can arrange 2 sample sofas for showroom testing and provide high-elasticity fabric options together with the available fire-retardant test documentation.\n\nFor the requested CIF shipment to Mersin, we will prepare the quotation based on the confirmed product configuration and current logistics cost.\n\nBefore final confirmation, please provide the consignee company information, tax ID and confirm customs-clearance capability in Türkiye. Import duty, VAT and destination clearance charges will be verified separately according to the applicable rules.\n\nBest regards,\nExport Sales Team`;
+function sales(){document.getElementById('sout').textContent=`1  INTENT ROUTER\n✓ B2B showroom buyer · Türkiye · 2 samples · CIF\n\n2  PRODUCT KNOWLEDGE AGENT\n✓ Compression sofa · high-elastic fabric · test document request\n\n3  QUOTATION AGENT\n✓ Sample quotation structure prepared\n\n4  TRADE & LOGISTICS AGENT\n⚠ Consignee / tax ID / customs capability requires verification\n\n5  RISK GATE\n⚠ Price + HS + duty/VAT + binding commitment → HUMAN APPROVAL`;
+document.getElementById('smail').textContent=`Dear Purchasing Team,\n\nThank you for your inquiry. We can arrange 2 sample sofas for showroom testing and provide high-elasticity fabric options together with the available fire-retardant documentation.\n\nFor CIF Mersin, we will prepare the quotation using the confirmed product configuration and current logistics cost. Before final confirmation, please provide the consignee company information, tax ID and confirm customs-clearance capability in Türkiye.\n\nBest regards,\nExport Sales Team`;}
+let fxRates={CNY:1,USD:null,EUR:null}, fxDate='—';
+
+async function refreshFX(){
+  const st=document.getElementById('fxstatus');
+  if(st) st.textContent='FX: loading...';
+  try{
+    const [u,e]=await Promise.all([
+      fetch('https://api.frankfurter.dev/v2/rate/cny/usd').then(r=>{if(!r.ok)throw new Error('USD rate');return r.json()}),
+      fetch('https://api.frankfurter.dev/v2/rate/cny/eur').then(r=>{if(!r.ok)throw new Error('EUR rate');return r.json()})
+    ]);
+    fxRates.USD=Number(u.rate); fxRates.EUR=Number(e.rate);
+    fxDate=u.date||e.date||'Latest';
+    document.getElementById('usdRate').textContent=`1 CNY = ${fxRates.USD.toFixed(5)} USD`;
+    document.getElementById('eurRate').textContent=`1 CNY = ${fxRates.EUR.toFixed(5)} EUR`;
+    document.getElementById('fxdate').textContent=fxDate;
+    if(st) st.textContent=`FX: ${fxDate} ✓`;
+    quote();
+  }catch(err){
+    if(st) st.textContent='FX unavailable · retry';
+    document.getElementById('usdRate').textContent='Unavailable';
+    document.getElementById('eurRate').textContent='Unavailable';
+  }
 }
-function quoteRun(){
- let q=+document.getElementById('qty').value,e=+document.getElementById('exw').value,l=+document.getElementById('logi').value,term=document.getElementById('term').value;
- let goods=q*e,total=goods+(term==='EXW'?0:l);
- document.getElementById('quoteOut').textContent=`QUOTATION STRUCTURE\nIncoterm: ${term}\nQuantity: ${q}\nGoods: ¥${goods.toLocaleString()}\nEstimated logistics/export charges: ¥${term==='EXW'?0:l.toLocaleString()}\n--------------------------------\nIndicative subtotal: ¥${total.toLocaleString()}\n\nAgent note:\n${term==='CIF'?'CIF requires confirmed freight + insurance. Destination import duty/VAT and customs clearance are normally handled separately unless contractually agreed.':term==='DDP'?'DDP requires verified duty/tax, customs responsibility and last-mile delivery cost before commitment.':'Final commercial terms require approval.'}`;
+
+function money(n,c){
+  const sym={CNY:'¥',USD:'$',EUR:'€'}[c]||'';
+  return `${sym}${Number(n).toLocaleString(undefined,{minimumFractionDigits:c==='CNY'?0:2,maximumFractionDigits:2})} ${c}`;
 }
-function tradeRun(){document.getElementById('tradeOut').textContent=`RISK ASSESSMENT\n\n1. Consignee / Importer → VERIFY\nConfirm legal entity, tax ID and import/customs-clearance capability.\n\n2. HS Classification → HUMAN + AUTHORITATIVE SOURCE\nDo not rely on LLM memory for final customs classification.\n\n3. Duty / VAT → REAL-TIME VERIFICATION\nRetrieve current official tariff and tax information before quotation commitment.\n\n4. CIF Responsibility → CONFIRM\nClarify seller/buyer cost boundary and destination charges.\n\n5. Logistics → COMPARE\nCompare LCL vs express based on current forwarder quotation.\n\nOverall status: ⚠ HUMAN REVIEW REQUIRED`; }
-function followRun(){document.getElementById('followOut').textContent=`OPPORTUNITY SIGNAL\nStage: Sample quotation\nSilence: 7 days\nRisk: Opportunity cooling / internal buyer review unknown\nPriority: Medium-High\n\nNEXT BEST ACTION\nSend a concise value-based follow-up today. Avoid immediate discounting. Ask whether product, fabric, logistics or internal approval is blocking the next step.\n\nDRAFT\nDear Customer,\n\nJust following up on the sample quotation and fabric options shared earlier. Please let us know if you need any additional product, logistics or certification information for your internal evaluation. We will be glad to support the next step.\n\nBest regards,\nExport Sales Team`; }
-function kbRun(){
- let q=document.getElementById('kbq').value.toLowerCase(),a='';
- if(q.includes('warranty')) a='Retrieved: Commercial Policy → Standard warranty: 3 years. Final scope is subject to the sales contract.';
- else if(q.includes('recover')) a='Retrieved: Product Handling Guide → Compression products begin rapid recovery after unpacking; full recovery is generally expected within 24–72 hours depending on product and environment.';
- else if(q.includes('fire')) a='Retrieved: Compliance Collection → Fire-retardant test documentation is available for applicable materials/products. Match the exact report to the ordered configuration before sending.';
- else if(q.includes('carton')) a='Retrieved: Product Master → Demo sample carton: 50 × 50 × 100 cm; gross weight: 31 kg/ctn.';
- else if(q.includes('fabric')||q.includes('elastic')) a='Retrieved: Material Compatibility → High-elasticity fabric is available for the demo compression sofa configuration. Exact color/material combination should be confirmed before production.';
- else a='No sufficiently grounded knowledge retrieved. → Factory confirmation required. The agent will not fabricate an answer.';
- document.getElementById('kbOut').textContent=`QUERY\n${document.getElementById('kbq').value}\n\n${a}\n\nSource mode: Enterprise knowledge retrieval (demo)`;
+
+function quote(){
+ let q=+document.getElementById('qty').value,e=+document.getElementById('exw').value,l=+document.getElementById('lg').value,t=document.getElementById('term').value,c=document.getElementById('currency').value;
+ let g=q*e, logistics=t==='EXW'?0:l, tot=g+logistics, r=document.getElementById('role').value;
+ let rate=fxRates[c], converted=(rate?tot*rate:null), goodsConv=(rate?g*rate:null), logConv=(rate?logistics*rate:null);
+ let fxLine=c==='CNY'?(L==='zh'?'基准币种：CNY':'Base currency: CNY'):(rate?`${L==='zh'?'汇率':'FX'}: 1 CNY = ${rate.toFixed(5)} ${c} · ${fxDate}`:(L==='zh'?'汇率加载中 / 暂不可用':'FX loading / unavailable'));
+ if(r==='employee'){
+   document.getElementById('qout').textContent=L==='zh'?`内部报价视图
+贸易条款：${t}
+数量：${q}
+
+人民币成本
+货品：${money(g,'CNY')}
+物流/出口预估：${money(logistics,'CNY')}
+预估小计：${money(tot,'CNY')}
+
+${c!=='CNY'?`客户币种视图
+货品：${goodsConv!==null?money(goodsConv,c):'等待汇率'}
+物流/出口：${logConv!==null?money(logConv,c):'等待汇率'}
+预估小计：${converted!==null?money(converted,c):'等待汇率'}
+
+${fxLine}`:fxLine}
+
+⚠ 最终运费、保险、税费及商业报价需人工审批。`:`INTERNAL QUOTATION
+Term: ${t}
+Quantity: ${q}
+
+CNY COST VIEW
+Goods: ${money(g,'CNY')}
+Logistics/export estimate: ${money(logistics,'CNY')}
+Indicative subtotal: ${money(tot,'CNY')}
+
+${c!=='CNY'?`CUSTOMER CURRENCY VIEW
+Goods: ${goodsConv!==null?money(goodsConv,c):'Waiting for FX'}
+Logistics/export: ${logConv!==null?money(logConv,c):'Waiting for FX'}
+Indicative subtotal: ${converted!==null?money(converted,c):'Waiting for FX'}
+
+${fxLine}`:fxLine}
+
+⚠ Final freight, insurance, tax and commercial price require approval.`;
+ }else{
+   document.getElementById('qout').textContent=L==='zh'?`授权外部视图
+贸易条款：${t}
+数量：${q}
+报价币种：${c}
+${converted!==null?`授权参考金额：${money(converted,c)}`:'汇率加载中...'}
+
+内部成本和利润受角色权限保护。
+最终销售/代理报价经审批后发布。`:`AUTHORIZED EXTERNAL VIEW
+Term: ${t}
+Quantity: ${q}
+Quote currency: ${c}
+${converted!==null?`Indicative authorized amount: ${money(converted,c)}`:'Exchange rate loading...'}
+
+Internal cost and margin are protected by role-based access control.
+Final selling / agent quotation is released after approval.`;
+ }
 }
-setLang('zh');
+function trade(){document.getElementById('tout').textContent=`1. Consignee / importer → VERIFY\n2. HS classification → OFFICIAL SOURCE + HUMAN\n3. Duty / VAT → LIVE VERIFICATION\n4. CIF responsibility boundary → CONFIRM\n5. LCL / Express → COMPARE CURRENT QUOTES\n\nOverall status: ⚠ HUMAN REVIEW REQUIRED`;}
+function follow(){document.getElementById('fout').textContent=`SIGNAL\nStage: Sample quotation · Silence: 7 days\nPriority: Medium-High\n\nNEXT BEST ACTION\nFollow up today without immediate discounting. Ask whether product, fabric, logistics or internal approval is blocking progress.\n\nDRAFT\nDear Customer,\nJust following up on the sample quotation and fabric options shared earlier. Please let us know if additional product, logistics or certification information would support your internal evaluation.\nBest regards,\nExport Sales Team`;}
+function knowledge(){let q=document.getElementById('kb').value.toLowerCase(),a=q.includes('warranty')?'Retrieved → Standard warranty: 3 years; final scope subject to contract.':q.includes('recover')?'Retrieved → Full recovery is generally expected within 24–72 hours depending on product and environment.':q.includes('fire')?'Retrieved → Applicable fire-retardant documentation can be provided; exact report must match the ordered configuration.':q.includes('carton')?'Retrieved → Demo carton: 50 × 50 × 100 cm; 31 kg gross/ctn.':(q.includes('fabric')||q.includes('elastic'))?'Retrieved → High-elasticity fabric is available for the demo compression-sofa configuration; final color/material combination requires production confirmation.':'No sufficiently grounded evidence retrieved → Factory confirmation required.';document.getElementById('kout').textContent=`QUERY\n${document.getElementById('kb').value}\n\n${a}\n\nSource: Enterprise knowledge retrieval (demo)`;}
+setLanguage('zh');setRole();refreshFX();
 </script>
 </body></html>
