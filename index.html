@@ -31,7 +31,7 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
 <body>
 <div class="app">
 <aside class="side">
- <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · LITE V1.0<br>B2B EXPORT & MANUFACTURING</div>
+ <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · INTERVIEW V1.2<br>B2B EXPORT & MANUFACTURING</div>
  <div class="lang"><button type="button" id="zbtn" class="mini on" onclick="setLanguage('zh'); return false;">中文</button><button type="button" id="ebtn" class="mini" onclick="setLanguage('en'); return false;">EN</button></div>
  <div id="langState" style="font-size:9px;color:#8d929c;margin:0 8px 8px">Language: 中文</div><div class="role"><select id="role" onchange="setRole()"><option value="employee">企业员工 / Employee</option><option value="agent">海外代理商 / Overseas Agent</option><option value="partner">合作伙伴 / Partner</option></select></div>
  <div class="nav">
@@ -193,36 +193,52 @@ function getApiBase(){
 async function checkApi(){
   const state=document.getElementById('apiState'); if(!state) return;
   const base=getApiBase();
-  if(!base){ state.textContent='API NOT SET'; return; }
+  if(!base){ state.textContent='● API NOT SET'; return; }
+  state.textContent='● CHECKING BACKEND';
   try{
     const r=await fetch(base+'/health');
-    state.textContent=r.ok?'API ONLINE':'API ERROR';
-  }catch(e){ state.textContent='API OFFLINE'; }
+    state.textContent=r.ok?'● BACKEND ONLINE':'● API ERROR';
+  }catch(e){ state.textContent='● API OFFLINE'; }
+}
+function resetPipeline(){
+  ['intent','product','quote','trade','approval'].forEach(x=>{
+    const e=document.getElementById('st-'+x); if(e){ e.style.opacity='.45'; e.textContent=e.textContent.replace(' ✓',''); }
+  });
+}
+function doneStep(id){
+  const e=document.getElementById('st-'+id); if(e){e.style.opacity='1'; if(!e.textContent.includes('✓')) e.textContent+=' ✓';}
 }
 async function runRealSalesAgent(){
   const out=document.getElementById('sout'), mail=document.getElementById('smail');
   const state=document.getElementById('apiState');
   const base=getApiBase();
+  resetPipeline();
   if(!base){
-    if(state) state.textContent='API NOT SET';
-    out.textContent=L==='zh'
-      ?'尚未配置云端后端地址。部署 Render 后，把 HTTPS 地址填入上方 Backend API URL。'
-      :'Backend API is not configured. After Render deployment, paste the HTTPS URL above.';
+    if(state) state.textContent='● API NOT SET';
+    out.textContent=L==='zh'?'尚未配置云端后端地址。':'Backend API is not configured.';
     return;
   }
-  out.textContent=L==='zh'?'正在调用真实 Sales Agent...':'Calling real Sales Agent...';
-  mail.textContent=L==='zh'?'正在生成客户回复...':'Generating customer reply...';
+  if(state) state.textContent='● RUNNING';
+  out.textContent=L==='zh'?'正在识别询盘并编排业务工具...':'Understanding inquiry and orchestrating business tools...';
+  mail.textContent=L==='zh'?'正在生成客户回复草稿...':'Generating customer reply draft...';
   try{
     const r=await fetch(base+'/api/sales-agent',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json(); if(state) state.textContent='API ONLINE';
-    const i=d.intent||{};
+    const d=await r.json(); if(state) state.textContent='● BACKEND ONLINE';
+    doneStep('intent'); doneStep('product'); doneStep('quote'); doneStep('trade'); doneStep('approval');
+    const i=d.intent||{}, q=d.quotation||{};
+    const orderType=i.order_type||((i.quantity||0)<=2?'Sample Order':'Bulk Order');
+    const freight=q.freight_status||'Pending live verification';
+    const duty=q.duty_vat_status||'Pending authoritative verification';
+    const lastmile=q.last_mile_status||'Pending live verification';
+    const finalddp=q.final_ddp_status||'Pending human approval';
     out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}
 Customer: ${i.customer_type||'—'}
 Country: ${i.country||'—'}
+Order Type: ${orderType}
 Product: ${i.product||'—'}
 Quantity: ${i.quantity??'—'}
 Incoterm: ${i.incoterm||'—'}
@@ -236,8 +252,12 @@ ${(d.tool_calls||[]).join(' → ')||'—'}
 ${L==='zh'?'【Product Knowledge】':'[PRODUCT KNOWLEDGE]'}
 ${d.product_summary||'—'}
 
-${L==='zh'?'【Quotation】':'[QUOTATION]'}
-${d.quotation_summary||'—'}
+${L==='zh'?'【Quotation Structure】':'[QUOTATION STRUCTURE]'}
+Product EXW: ${q.product_exw_display||d.quotation_summary||'—'}
+Freight: ${freight}
+Duty / VAT: ${duty}
+Last-mile Delivery: ${lastmile}
+Final ${i.incoterm||'Commercial'} Price: ${finalddp}
 
 ${L==='zh'?'【Trade & Logistics Risk】':'[TRADE & LOGISTICS RISK]'}
 ${(d.risks||[]).map(x=>'• '+x).join('\n')||'—'}
@@ -246,7 +266,7 @@ ${L==='zh'?'【Human-in-the-loop】':'[HUMAN-IN-THE-LOOP]'}
 ${d.approval_required?'HUMAN APPROVAL REQUIRED':'AUTO'}`;
     mail.textContent=d.reply_draft||'—';
   }catch(e){
-    if(state) state.textContent='API OFFLINE';
+    if(state) state.textContent='● API OFFLINE';
     out.textContent=(L==='zh'?'Sales Agent 后端连接失败：':'Sales Agent backend connection failed: ')+e.message;
   }
 }
@@ -342,11 +362,11 @@ Final selling / agent quotation is released after approval.`;
 function trade(){document.getElementById('tout').textContent=`1. Consignee / importer → VERIFY\n2. HS classification → OFFICIAL SOURCE + HUMAN\n3. Duty / VAT → LIVE VERIFICATION\n4. CIF responsibility boundary → CONFIRM\n5. LCL / Express → COMPARE CURRENT QUOTES\n\nOverall status: ⚠ HUMAN REVIEW REQUIRED`;}
 function follow(){document.getElementById('fout').textContent=`SIGNAL\nStage: Sample quotation · Silence: 7 days\nPriority: Medium-High\n\nNEXT BEST ACTION\nFollow up today without immediate discounting. Ask whether product, fabric, logistics or internal approval is blocking progress.\n\nDRAFT\nDear Customer,\nJust following up on the sample quotation and fabric options shared earlier. Please let us know if additional product, logistics or certification information would support your internal evaluation.\nBest regards,\nExport Sales Team`;}
 function knowledge(){let q=document.getElementById('kb').value.toLowerCase(),a=q.includes('warranty')?'Retrieved → Standard warranty: 3 years; final scope subject to contract.':q.includes('recover')?'Retrieved → Full recovery is generally expected within 24–72 hours depending on product and environment.':q.includes('fire')?'Retrieved → Applicable fire-retardant documentation can be provided; exact report must match the ordered configuration.':q.includes('carton')?'Retrieved → Demo carton: 50 × 50 × 100 cm; 31 kg gross/ctn.':(q.includes('fabric')||q.includes('elastic'))?'Retrieved → High-elasticity fabric is available for the demo compression-sofa configuration; final color/material combination requires production confirmation.':'No sufficiently grounded evidence retrieved → Factory confirmation required.';document.getElementById('kout').textContent=`QUERY\n${document.getElementById('kb').value}\n\n${a}\n\nSource: Enterprise knowledge retrieval (demo)`;}
-setLanguage('zh');setRole();refreshFX();
+setLanguage('zh');setRole();refreshFX();setTimeout(checkApi,500);
 </script>
 <script>
 // After Render deployment, set this once to your backend HTTPS URL.
-// Example: window.AGENT_API_BASE = "https://your-service.onrender.com";
+// Example: window.AGENT_API_BASE = "https://furniture-ai-agent.onrender.com";
 window.AGENT_API_BASE = "https://furniture-ai-agent.onrender.com";
 </script>
 </body></html>

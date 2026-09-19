@@ -1,49 +1,20 @@
-# Furniture AI Agent Center — Full V1.1 Deployment
+# Furniture AI Agent Center — Interview V1.2
 
-## Full front-end retained
-- 中文 / EN
-- 企业员工 / 海外代理商 role selector
-- Sales Agent
-- Quotation Agent
-- Trade & Logistics Agent
-- Customer Follow-up Agent
-- Product Knowledge Agent
-- Marketing & SEO roadmap
-- Management Insight roadmap
-- CNY / USD / EUR quotation
-- Live CNY→USD / EUR FX and rate date
-- RBAC / internal-cost hiding
-- Agent orchestration
-- Human-in-the-loop
+V1.2 keeps the full multi-agent UI and upgrades the public Sales Agent demo.
 
-## V1.1 upgrade
-Sales Agent now calls the FastAPI backend:
-Sales → Product Knowledge Tool → Quotation Tool → Trade & Logistics Tool → Human Approval.
+## V1.2 improvements
+- Visible cloud backend health status
+- Agent execution pipeline: Intent → Product → Quotation → Trade & Logistics → Human Approval
+- Sample vs Bulk Order recognition
+- Delivered-price quotation decomposition
+- EXW is explicitly separated from Freight / Duty & VAT / Last-mile / Final DDP
+- Unknown live logistics and tax data are marked pending verification rather than fabricated
+- Customer reply draft reflects the selected Incoterm and destination
+- Existing bilingual UI, roles/RBAC, CNY/USD/EUR FX, and other agents retained
+- FastAPI backend remains deployable on Render Free
 
-## GitHub Pages
-Upload `index.html` to repository root. Keep Pages on:
-`main` + `/(root)`.
+## Runtime truthfulness
+Current V1.2 is a real public front-end/back-end tool workflow with deterministic intent parsing and business tools. It is LLM-ready, but it does not claim live LLM reasoning until an LLM integration is enabled.
 
-## Render
-This repository includes `render.yaml`.
-Connect the same GitHub repository to Render and deploy the web service.
-
-Backend:
-- Root directory: `backend`
-- Build: `pip install -r requirements.txt`
-- Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-
-Optional environment variables:
-- `OPENAI_API_KEY`
-- `OPENAI_MODEL=gpt-5-mini`
-
-Without an API key, the backend still runs using deterministic fallback.
-
-## Connect frontend to Render
-After Render gives an HTTPS URL, open `index.html` and set:
-
-`window.AGENT_API_BASE = "https://YOUR-SERVICE.onrender.com";`
-
-Commit it to GitHub. The Sales Agent will then work for interviewers from the public GitHub Pages URL.
-
-Never put `OPENAI_API_KEY` into `index.html`.
+## Deploy
+Upload the changed files to the same GitHub repository. Render can redeploy automatically from `main`.
