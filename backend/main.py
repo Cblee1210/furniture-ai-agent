@@ -16,7 +16,7 @@ class SalesRequest(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "sales-agent", "version": "1.2.0"}
+    return {"status": "ok", "service": "sales-agent", "version": "1.2.1"}
 
 @app.post("/api/sales-agent")
 def sales_agent(req: SalesRequest):

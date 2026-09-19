@@ -1,4 +1,4 @@
-# Furniture AI Agent Center — Interview V1.2
+# Furniture AI Agent Center — Interview V1.2.1 Hotfix
 
 V1.2 keeps the full multi-agent UI and upgrades the public Sales Agent demo.
 
@@ -18,3 +18,7 @@ Current V1.2 is a real public front-end/back-end tool workflow with deterministi
 
 ## Deploy
 Upload the changed files to the same GitHub repository. Render can redeploy automatically from `main`.
+
+
+## V1.2.1 hotfix
+- Fixes the Trade & Logistics tool import compatibility issue that caused the V1.2 Render startup failure.
