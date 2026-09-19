@@ -24,6 +24,10 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
 .access{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.access .card{padding:16px}.access h3{font-size:13px;margin:0 0 10px}.check{font-size:11px;line-height:1.8;color:#50545b}
 .casebar{background:#eef2f7;border:1px solid #dde3eb;border-radius:10px;padding:10px 12px;font-size:11px;margin:14px 0;color:#45505f}.footer{font-size:10px;color:#90949b;margin-top:22px;line-height:1.6}
 .hidden-cost{transition:.2s}.restricted .hidden-cost{filter:blur(5px);user-select:none}.restricted .internal-only{display:none}
+.api-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;margin:12px 0;background:#fff;border:1px solid var(--line);border-radius:10px;font-size:10px}
+.api-left{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.api-dot{width:8px;height:8px;border-radius:50%;background:#9ca3af;display:inline-block}.api-online .api-dot{background:#16a34a}.api-running .api-dot{background:#d97706}.api-offline .api-dot{background:#dc2626}
+.pipeline{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 13px}.pipe-step{opacity:.45;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:#fafafa;font-size:9.5px;transition:.2s}.pipe-arr{font-size:10px;color:#aaa}.pipe-step.done{opacity:1;background:#effaf5;border-color:#ccebdd;color:#166534}
+
 @media(max-width:1000px){.app{grid-template-columns:1fr}.side{height:auto;position:relative}.nav{display:flex;overflow:auto}.nav button{min-width:125px}.metrics,.cards,.access{grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}}
 @media(max-width:620px){.main{padding:18px}.metrics,.cards,.access{grid-template-columns:1fr}.topbar h1{font-size:25px}}
 </style>
@@ -31,7 +35,7 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
 <body>
 <div class="app">
 <aside class="side">
- <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · INTERVIEW V1.2<br>B2B EXPORT & MANUFACTURING</div>
+ <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · INTERVIEW V1.2.2<br>B2B EXPORT & MANUFACTURING</div>
  <div class="lang"><button type="button" id="zbtn" class="mini on" onclick="setLanguage('zh'); return false;">中文</button><button type="button" id="ebtn" class="mini" onclick="setLanguage('en'); return false;">EN</button></div>
  <div id="langState" style="font-size:9px;color:#8d929c;margin:0 8px 8px">Language: 中文</div><div class="role"><select id="role" onchange="setRole()"><option value="employee">企业员工 / Employee</option><option value="agent">海外代理商 / Overseas Agent</option><option value="partner">合作伙伴 / Partner</option></select></div>
  <div class="nav">
@@ -45,7 +49,7 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
  </div>
 </aside>
 
-<main id="main" class="main">
+<main id="main" class="main"><input id="apiBase" type="hidden" value="">
 <section id="home" class="page on">
  <div class="topbar"><div><div class="eyebrow">Manufacturing AI · Multi-Agent Prototype</div><h1>AI Agent Center</h1><div class="desc" data-zh="面向家具制造企业及全球合作伙伴的多智能体业务平台。通过 Agent 编排，将企业知识、报价规则、物流与贸易信息、CRM 跟进和人工审批连接为完整业务闭环。" data-en="A multi-agent business platform for furniture manufacturers and global partners. Agent orchestration connects enterprise knowledge, quotation rules, logistics & trade intelligence, CRM follow-up and human approval into one operational loop.">面向家具制造企业及全球合作伙伴的多智能体业务平台。通过 Agent 编排，将企业知识、报价规则、物流与贸易信息、CRM 跟进和人工审批连接为完整业务闭环。</div></div><div class="status">● DEMO ONLINE</div></div>
  <div class="casebar"><b data-zh="统一演示案例：" data-en="Shared demo case:">统一演示案例：</b> <span data-zh="海外展厅客户采购 2 件压缩沙发样品，要求 CIF Mersin、高弹面料及阻燃检测资料。" data-en="An overseas showroom buyer requests 2 compression-sofa samples, CIF Mersin, high-elastic fabric and fire-retardant documentation.">海外展厅客户采购 2 件压缩沙发样品，要求 CIF Mersin、高弹面料及阻燃检测资料。</span></div>
@@ -66,7 +70,19 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
  <div class="footer" data-zh="匿名化原型：不包含真实制造商、品牌或客户身份。实时税率、库存、运价及正式商务承诺须连接授权数据源并经过人工审批。" data-en="Anonymized prototype: no real manufacturer, brand or customer identity is included. Live tariffs, inventory, freight rates and binding commercial commitments require authorized data sources and human approval.">匿名化原型：不包含真实制造商、品牌或客户身份。实时税率、库存、运价及正式商务承诺须连接授权数据源并经过人工审批。</div>
 </section>
 
-<section id="sales" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">ORCHESTRATOR</div><h1>Sales Agent</h1><div class="workspace">
+<section id="sales" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">ORCHESTRATOR</div><h1>Sales Agent</h1>
+<div id="apiStrip" class="api-strip">
+  <div class="api-left"><span class="api-dot"></span><b id="apiState">● CHECKING BACKEND</b><span id="apiVersion" style="color:#70747c">Render API</span></div>
+  <span style="color:#70747c" data-zh="公网后端 · 实时调用" data-en="Public backend · Live API">公网后端 · 实时调用</span>
+</div>
+<div class="pipeline">
+ <span id="st-intent" class="pipe-step">Intent Router</span><span class="pipe-arr">→</span>
+ <span id="st-product" class="pipe-step">Product RAG</span><span class="pipe-arr">→</span>
+ <span id="st-quote" class="pipe-step">Quotation</span><span class="pipe-arr">→</span>
+ <span id="st-trade" class="pipe-step">Trade & Logistics</span><span class="pipe-arr">→</span>
+ <span id="st-approval" class="pipe-step">Human Approval</span>
+</div>
+<div class="workspace">
 <div class="panel"><h2 data-zh="客户询盘" data-en="Customer Inquiry">客户询盘</h2><textarea id="inq">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><button class="btn primary" onclick="runRealSalesAgent()">Run AI Sales Agent</button></div>
 <div class="panel"><h2 data-zh="实时编排结果" data-en="Live Orchestration">实时编排结果</h2><div id="sout" class="output">Waiting for inquiry...</div></div>
 <div class="panel"><h2 data-zh="审批控制" data-en="Approval Control">审批控制</h2><div class="kv"><div class="k">Product facts</div><div class="v">Auto</div><div class="k">Final price</div><div class="v">Human approval</div><div class="k">HS / Duty / VAT</div><div class="v">Authoritative source + review</div><div class="k">Contract commitment</div><div class="v">Human approval</div></div></div>
@@ -218,7 +234,7 @@ async function runRealSalesAgent(){
     out.textContent=L==='zh'?'尚未配置云端后端地址。':'Backend API is not configured.';
     return;
   }
-  if(state) state.textContent='● RUNNING';
+  if(state) state.textContent='● RUNNING'; document.getElementById('apiStrip')?.classList.remove('api-online','api-offline'); document.getElementById('apiStrip')?.classList.add('api-running');
   out.textContent=L==='zh'?'正在识别询盘并编排业务工具...':'Understanding inquiry and orchestrating business tools...';
   mail.textContent=L==='zh'?'正在生成客户回复草稿...':'Generating customer reply draft...';
   try{
@@ -227,7 +243,7 @@ async function runRealSalesAgent(){
       body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
     });
     if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json(); if(state) state.textContent='● BACKEND ONLINE';
+    const d=await r.json(); if(state) state.textContent='● BACKEND ONLINE'; document.getElementById('apiStrip')?.classList.remove('api-running','api-offline'); document.getElementById('apiStrip')?.classList.add('api-online');
     doneStep('intent'); doneStep('product'); doneStep('quote'); doneStep('trade'); doneStep('approval');
     const i=d.intent||{}, q=d.quotation||{};
     const orderType=i.order_type||((i.quantity||0)<=2?'Sample Order':'Bulk Order');
