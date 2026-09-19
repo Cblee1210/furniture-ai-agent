@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from agent import run_sales_agent
 from llm_gateway import public_provider_status
 
-app = FastAPI(title="Furniture AI Sales Agent", version="1.3.2")
+app = FastAPI(title="Furniture AI Sales Agent", version="1.3.3")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], allow_credentials=False,
@@ -22,7 +22,7 @@ def health(provider: Optional[str] = None):
     return {
         "status": "ok",
         "service": "sales-agent",
-        "version": "1.3.2",
+        "version": "1.3.3",
         "llm": public_provider_status(provider),
     }
 

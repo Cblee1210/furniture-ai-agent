@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>XX家具制造商 · AI Agent Center V1.3.2</title>
+<title>XX家具制造商 · AI Agent Center V1.3.3</title>
 <style>
 :root{--bg:#f6f7f8;--card:#fff;--ink:#17181b;--muted:#70747c;--line:#e5e7eb;--dark:#17181b;--green:#18745b;--amber:#a35b10;--blue:#315ea8}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -35,7 +35,7 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
 <body>
 <div class="app">
 <aside class="side">
- <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · INTERVIEW V1.3.2<br>B2B EXPORT & MANUFACTURING</div>
+ <div class="logo">XX家具制造商</div><div class="sublogo">AI AGENT CENTER · INTERVIEW V1.3.3<br>B2B EXPORT & MANUFACTURING</div>
  <div class="lang"><button type="button" id="zbtn" class="mini on" onclick="setLanguage('zh'); return false;">中文</button><button type="button" id="ebtn" class="mini" onclick="setLanguage('en'); return false;">EN</button></div>
  <div id="langState" style="font-size:9px;color:#8d929c;margin:0 8px 8px">Language: 中文</div><div class="role"><select id="role" onchange="setRole()"><option value="employee">企业员工 / Employee</option><option value="agent">海外代理商 / Overseas Agent</option><option value="partner">合作伙伴 / Partner</option></select></div>
  <div class="nav">
@@ -82,11 +82,12 @@ table{width:100%;border-collapse:collapse;font-size:10.5px}th,td{padding:8px;bor
  <span id="st-trade" class="pipe-step">Trade & Logistics</span><span class="pipe-arr">→</span>
  <span id="st-approval" class="pipe-step">Human Approval</span>
 </div>
+<div id="runProgress" style="font-size:10px;color:#70747c;margin:-5px 0 13px">Ready · waiting for inquiry</div>
 <div class="workspace">
 <div class="panel"><h2 data-zh="客户询盘" data-en="Customer Inquiry">客户询盘</h2><textarea id="inq">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><button class="btn primary" onclick="runRealSalesAgent()">Run AI Sales Agent</button></div>
 <div class="panel"><h2 data-zh="实时编排结果" data-en="Live Orchestration">实时编排结果</h2><div id="sout" class="output">Waiting for inquiry...</div></div>
 <div class="panel"><h2 data-zh="审批控制" data-en="Approval Control">审批控制</h2><div class="kv"><div class="k">Product facts</div><div class="v">Auto</div><div class="k">Final price</div><div class="v">Human approval</div><div class="k">HS / Duty / VAT</div><div class="v">Authoritative source + review</div><div class="k">Contract commitment</div><div class="v">Human approval</div></div></div>
-<div class="panel"><h2 data-zh="回复草稿" data-en="Reply Draft">回复草稿</h2><div id="smail" class="output">Run the agent to generate a draft.</div><div class="sep"><button class="btn primary">Approve</button> <button class="btn secondary">Human Review</button></div></div>
+<div class="panel"><h2 data-zh="回复草稿" data-en="Reply Draft">回复草稿</h2><div id="smail" class="output">Run the agent to generate a draft.</div><div class="sep"><button id="approveBtn" class="btn primary" type="button" onclick="approveResult()" disabled>Approve</button> <button id="reviewBtn" class="btn secondary" type="button" onclick="requestReview()" disabled>Human Review</button> <span id="approvalState" style="font-size:10px;color:#70747c;margin-left:8px">Not submitted</span></div></div>
 </div></section>
 
 <section id="quote" class="page"><button class="back" onclick="go('home')">← Agent Center</button><div class="eyebrow">BUSINESS RULE AGENT</div><h1>Quotation Agent</h1><div class="workspace">
@@ -220,78 +221,67 @@ async function checkApi(){
     const badge=document.getElementById('deploymentBadge'); if(badge && d.llm) badge.textContent=d.llm.region==='china'?'🇨🇳 China · Qwen · Region Locked':'🌍 Global · OpenAI · Region Locked';
   }catch(e){ state.textContent='● API OFFLINE'; }
 }
-function resetPipeline(){
-  ['intent','product','quote','trade','approval'].forEach(x=>{
-    const e=document.getElementById('st-'+x); if(e){ e.style.opacity='.45'; e.textContent=e.textContent.replace(' ✓',''); }
-  });
+function setPipe(id,label,state='idle'){
+  const e=document.getElementById('st-'+id); if(!e) return;
+  e.classList.remove('done'); e.style.opacity=state==='idle'?'.45':'1';
+  e.textContent=label+(state==='done'?' ✓':state==='active'?' …':'');
+  if(state==='done') e.classList.add('done');
 }
-function doneStep(id){
-  const e=document.getElementById('st-'+id); if(e){e.style.opacity='1'; if(!e.textContent.includes('✓')) e.textContent+=' ✓';}
+function resetPipeline(){
+  setPipe('intent','Intent Router'); setPipe('product','Product RAG'); setPipe('quote','Quotation'); setPipe('trade','Trade & Logistics'); setPipe('approval','Human Approval');
+  const p=document.getElementById('runProgress'); if(p) p.textContent='Ready · waiting for inquiry';
+  const a=document.getElementById('approveBtn'), r=document.getElementById('reviewBtn'); if(a)a.disabled=true;if(r)r.disabled=true;
+  const as=document.getElementById('approvalState'); if(as)as.textContent='Not submitted';
+}
+function approveResult(){
+  setPipe('approval','Human Approval','done');
+  const s=document.getElementById('approvalState'); if(s)s.textContent='Approved by human reviewer';
+}
+function requestReview(){
+  setPipe('approval','Human Approval','active');
+  const s=document.getElementById('approvalState'); if(s)s.textContent='Human review requested';
 }
 async function runRealSalesAgent(){
-  const out=document.getElementById('sout'), mail=document.getElementById('smail');
-  const state=document.getElementById('apiState');
-  const base=getApiBase();
+  const out=document.getElementById('sout'), mail=document.getElementById('smail'), progress=document.getElementById('runProgress');
+  const state=document.getElementById('apiState'), base=getApiBase();
   resetPipeline();
-  if(!base){
-    if(state) state.textContent='● API NOT SET';
-    out.textContent=L==='zh'?'尚未配置云端后端地址。':'Backend API is not configured.';
-    return;
-  }
+  if(!base){ if(state) state.textContent='● API NOT SET'; out.textContent=L==='zh'?'尚未配置云端后端地址。':'Backend API is not configured.'; return; }
   if(state) state.textContent='● RUNNING'; document.getElementById('apiStrip')?.classList.remove('api-online','api-offline'); document.getElementById('apiStrip')?.classList.add('api-running');
-  out.textContent=L==='zh'?'正在识别询盘并编排业务工具...':'Understanding inquiry and orchestrating business tools...';
-  mail.textContent=L==='zh'?'正在生成客户回复草稿...':'Generating customer reply draft...';
+  setPipe('intent','Intent Router','active');
+  out.textContent=L==='zh'?'Qwen 正在理解客户询盘…':'Qwen is understanding the customer inquiry…';
+  mail.textContent=L==='zh'?'等待业务工具结果后生成客户回复…':'Waiting for business-tool results before drafting reply…';
+  const started=performance.now();
+  let phase=0;
+  const phases=[
+    ['intent','Intent Router','Qwen 正在提取客户意图与结构化字段…','Qwen is extracting intent and structured fields…'],
+    ['product','Product RAG','正在准备产品知识与业务工具上下文…','Preparing product knowledge and business-tool context…'],
+    ['quote','Quotation','正在执行报价与风险控制流程…','Running quotation and risk-control workflow…'],
+    ['trade','Trade & Logistics','正在等待贸易检查与 Qwen 回复生成…','Waiting for trade checks and Qwen reply generation…']
+  ];
+  const ticker=setInterval(()=>{
+    const sec=((performance.now()-started)/1000).toFixed(1);
+    if(progress) progress.textContent=(L==='zh'?'处理中':'Processing')+' · '+sec+'s';
+    const next=Math.min(Math.floor((performance.now()-started)/4500),3);
+    if(next>phase){ phase=next; const x=phases[phase]; setPipe(x[0],x[1],'active'); out.textContent=L==='zh'?x[2]:x[3]; }
+  },250);
   try{
-    const r=await fetch(base+'/api/sales-agent',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})
-    });
+    const r=await fetch(base+'/api/sales-agent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({inquiry:document.getElementById('inq').value,language:L})});
     if(!r.ok) throw new Error('HTTP '+r.status);
-    const d=await r.json(); if(state) state.textContent='● BACKEND ONLINE'; document.getElementById('apiStrip')?.classList.remove('api-running','api-offline'); document.getElementById('apiStrip')?.classList.add('api-online');
-    doneStep('intent'); doneStep('product'); doneStep('quote'); doneStep('trade'); doneStep('approval');
+    const d=await r.json(); clearInterval(ticker);
+    const elapsed=((performance.now()-started)/1000).toFixed(1);
+    if(state) state.textContent='● BACKEND ONLINE'; document.getElementById('apiStrip')?.classList.remove('api-running','api-offline'); document.getElementById('apiStrip')?.classList.add('api-online');
+    setPipe('intent','Intent Router','done'); setPipe('product','Product RAG','done'); setPipe('quote','Quotation','done'); setPipe('trade','Trade & Logistics','done'); setPipe('approval','Awaiting Approval','active');
+    if(progress) progress.textContent=(L==='zh'?'Agent 执行完成 · 总耗时 ':'Agent run completed · total ') + elapsed + 's · '+(L==='zh'?'等待人工审批':'awaiting human approval');
+    const ab=document.getElementById('approveBtn'), rb=document.getElementById('reviewBtn'); if(ab)ab.disabled=false;if(rb)rb.disabled=false;
+    const ast=document.getElementById('approvalState'); if(ast)ast.textContent='Awaiting human approval';
     const i=d.intent||{}, q=d.quotation||{};
     const orderType=i.order_type||((i.quantity||0)<=2?'Sample Order':'Bulk Order');
-    const freight=q.freight_status||'Pending live verification';
-    const duty=q.duty_vat_status||'Pending authoritative verification';
-    const lastmile=q.last_mile_status||'Pending live verification';
-    const finalddp=q.final_ddp_status||'Pending human approval';
-    out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}
-Customer: ${i.customer_type||'—'}
-Country: ${i.country||'—'}
-Order Type: ${orderType}
-Product: ${i.product||'—'}
-Quantity: ${i.quantity??'—'}
-Incoterm: ${i.incoterm||'—'}
-Destination: ${i.destination||'—'}
-Fabric: ${i.fabric_requirement||'—'}
-Documents: ${i.document_requirement||'—'}
-
-${L==='zh'?'【Agent Routing】':'[AGENT ROUTING]'}
-${(d.tool_calls||[]).join(' → ')||'—'}
-
-${L==='zh'?'【Product Knowledge】':'[PRODUCT KNOWLEDGE]'}
-${d.product_summary||'—'}
-
-${L==='zh'?'【Quotation Structure】':'[QUOTATION STRUCTURE]'}
-Product EXW: ${q.product_exw_display||d.quotation_summary||'—'}
-Freight: ${freight}
-Duty / VAT: ${duty}
-Last-mile Delivery: ${lastmile}
-Final ${i.incoterm||'Commercial'} Price: ${finalddp}
-
-${L==='zh'?'【Trade & Logistics Risk】':'[TRADE & LOGISTICS RISK]'}
-${(d.risks||[]).map(x=>'• '+x).join('\n')||'—'}
-
-${L==='zh'?'【LLM Runtime】':'[LLM RUNTIME]'}
-${d.runtime_mode||'—'}
-Intent: ${d.llm?.intent_source||'—'} · Reply: ${d.llm?.reply_source||'—'}
-${(d.llm?.warnings||[]).length ? 'Fallback: '+d.llm.warnings.join(' / ') : 'Fallback: none'}
-
-${L==='zh'?'【Human-in-the-loop】':'[HUMAN-IN-THE-LOOP]'}
-${d.approval_required?'HUMAN APPROVAL REQUIRED':'AUTO'}`;
+    const freight=q.freight_status||'Pending live verification', duty=q.duty_vat_status||'Pending authoritative verification', lastmile=q.last_mile_status||'Pending live verification', finalddp=q.final_ddp_status||'Pending human approval';
+    out.textContent=`${L==='zh'?'【AI意图识别】':'[AI INTENT]'}\nCustomer: ${i.customer_type||'—'}\nCountry: ${i.country||'—'}\nOrder Type: ${orderType}\nProduct: ${i.product||'—'}\nQuantity: ${i.quantity??'—'}\nIncoterm: ${i.incoterm||'—'}\nDestination: ${i.destination||'—'}\nFabric: ${i.fabric_requirement||'—'}\nDocuments: ${i.document_requirement||'—'}\n\n${L==='zh'?'【Agent Routing】':'[AGENT ROUTING]'}\n${(d.tool_calls||[]).join(' → ')||'—'}\n\n${L==='zh'?'【Product Knowledge】':'[PRODUCT KNOWLEDGE]'}\n${d.product_summary||'—'}\n\n${L==='zh'?'【Quotation Structure】':'[QUOTATION STRUCTURE]'}\nProduct EXW: ${q.product_exw_display||d.quotation_summary||'—'}\nFreight: ${freight}\nDuty / VAT: ${duty}\nLast-mile Delivery: ${lastmile}\nFinal ${i.incoterm||'Commercial'} Price: ${finalddp}\n\n${L==='zh'?'【Trade & Logistics Risk】':'[TRADE & LOGISTICS RISK]'}\n${(d.risks||[]).map(x=>'• '+x).join('\n')||'—'}\n\n${L==='zh'?'【LLM Runtime】':'[LLM RUNTIME]'}\n${d.runtime_mode||'—'}\nIntent: ${d.llm?.intent_source||'—'} · Reply: ${d.llm?.reply_source||'—'}\n${(d.llm?.warnings||[]).length ? 'Fallback: '+d.llm.warnings.join(' / ') : 'Fallback: none'}\nTotal runtime: ${elapsed}s\n\n${L==='zh'?'【Human-in-the-loop】':'[HUMAN-IN-THE-LOOP]'}\n${d.approval_required?'AWAITING HUMAN APPROVAL':'AUTO'}`;
     mail.textContent=d.reply_draft||'—';
   }catch(e){
-    if(state) state.textContent='● API OFFLINE';
+    clearInterval(ticker); if(state) state.textContent='● API OFFLINE'; document.getElementById('apiStrip')?.classList.remove('api-running','api-online'); document.getElementById('apiStrip')?.classList.add('api-offline');
+    if(progress) progress.textContent=(L==='zh'?'执行失败 · ':'Run failed · ')+e.message;
     out.textContent=(L==='zh'?'Sales Agent 后端连接失败：':'Sales Agent backend connection failed: ')+e.message;
   }
 }
