@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XX家具制造商 · AI Agent Center</title>
+<style>
+:root{--bg:#f5f5f3;--ink:#171717;--muted:#71717a;--line:#e4e4e7;--card:#fff;--dark:#18181b;--soft:#f4f4f5;--good:#166534;--warn:#9a3412}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink)}
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh}.side{background:#111113;color:#fff;padding:26px 18px;position:sticky;top:0;height:100vh}
+.brand{font-size:18px;font-weight:800;margin:0 8px 6px}.brand2{font-size:11px;color:#a1a1aa;margin:0 8px 28px;line-height:1.5}
+.nav button{display:block;width:100%;text-align:left;border:0;background:transparent;color:#d4d4d8;padding:11px 12px;border-radius:9px;margin:4px 0;cursor:pointer;font-size:13px}.nav button:hover,.nav button.active{background:#27272a;color:#fff}
+.main{padding:34px;max-width:1500px;width:100%}.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#71717a}.hero h1{font-size:36px;margin:8px 0 8px}.hero p{color:var(--muted);margin:0;max-width:760px;line-height:1.65}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}.stat,.card,.panel{background:#fff;border:1px solid var(--line);border-radius:15px}.stat{padding:16px}.stat b{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.agent{padding:18px;cursor:pointer;transition:.15s}.agent:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.06)}.agent h3{margin:12px 0 6px;font-size:16px}.agent p{font-size:12.5px;color:var(--muted);line-height:1.55;min-height:58px}.tag{display:inline-block;font-size:10px;padding:4px 7px;border-radius:999px;background:#ecfdf5;color:#166534}.soon{background:#f4f4f5;color:#71717a}
+.icon{font-size:20px}.page{display:none}.page.active{display:block}
+.back{border:0;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;margin-bottom:18px}
+.workspace{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{padding:18px}.panel h2{font-size:15px;margin:0 0 13px}
+textarea,input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;background:#fcfcfc;font:inherit;margin:5px 0 10px}textarea{min-height:190px;resize:vertical}
+.btn{border:0;border-radius:9px;padding:10px 13px;font-weight:700;cursor:pointer}.primary{background:#18181b;color:#fff}.secondary{background:#eeeef0;color:#18181b}
+.kv{display:grid;grid-template-columns:145px 1fr;gap:8px 10px;font-size:13px}.k{color:var(--muted)}.v{font-weight:650}.sep{border-top:1px solid var(--line);margin:16px 0;padding-top:16px}
+.flow{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0}.flow span{font-size:11px;background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:999px}.arrow{color:#a1a1aa!important;border:0!important;background:transparent!important;padding:8px 0!important}
+.output{white-space:pre-wrap;background:#fafafa;border:1px solid var(--line);border-radius:10px;padding:13px;font-size:12.5px;line-height:1.65;min-height:150px}
+.notice{padding:11px;border-radius:10px;font-size:12px;line-height:1.55;background:#fff7ed;color:var(--warn)}.good{background:#f0fdf4;color:var(--good)}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
+.langbar{display:flex;gap:6px;margin:0 8px 20px}.langbtn{flex:1;border:1px solid #3f3f46;background:#18181b;color:#a1a1aa;border-radius:8px;padding:7px;cursor:pointer;font-size:11px}.langbtn.on{background:#fff;color:#18181b;border-color:#fff}
+.footer{font-size:11px;color:#8b8b94;margin-top:25px;line-height:1.6}
+@media(max-width:1000px){.shell{grid-template-columns:1fr}.side{height:auto;position:relative}.nav{display:flex;overflow:auto}.nav button{min-width:130px}.stats,.cards{grid-template-columns:1fr 1fr}.workspace{grid-template-columns:1fr}}
+@media(max-width:620px){.main{padding:20px}.stats,.cards{grid-template-columns:1fr}.hero h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side">
+ <div class="brand">XX家具制造商</div><div class="brand2">AI AGENT CENTER<br>B2B Export & Manufacturing Operations</div>
+ <div class="langbar"><button id="zhBtn" class="langbtn on" onclick="setLang('zh')">中文</button><button id="enBtn" class="langbtn" onclick="setLang('en')">EN</button></div>
+ <div class="nav">
+  <button class="active" onclick="show('home',this)">⌂ <span data-zh="智能体中心" data-en="Agent Center">智能体中心</span></button>
+  <button onclick="show('sales',this)">◎ <span data-zh="销售智能体" data-en="Sales Agent">销售智能体</span></button>
+  <button onclick="show('quote',this)">¥ <span data-zh="报价智能体" data-en="Quotation Agent">报价智能体</span></button>
+  <button onclick="show('trade',this)">⇄ <span data-zh="贸易与物流" data-en="Trade & Logistics">贸易与物流</span></button>
+  <button onclick="show('follow',this)">◷ <span data-zh="客户跟进" data-en="Follow-up Agent">客户跟进</span></button>
+  <button onclick="show('knowledge',this)">◇ <span data-zh="产品知识库" data-en="Product Knowledge">产品知识库</span></button>
+ </div>
+</aside>
+<main class="main">
+
+<section id="home" class="page active">
+ <div class="hero"><div class="eyebrow">Manufacturing AI Prototype · V0.2</div><h1>AI Agent Center</h1>
+ <p><span data-zh="面向家具制造企业海外 B2B 业务的轻量多智能体原型。通过企业知识、业务规则、外部工具与人工审批，将询盘、报价、贸易物流和客户跟进连接成可执行工作流。" data-en="A lightweight multi-agent prototype for furniture manufacturers and global B2B partners. It connects inquiries, quotations, trade logistics and customer follow-up through enterprise knowledge, business rules, external tools and human approval.">面向家具制造企业海外 B2B 业务的轻量多智能体原型。通过企业知识、业务规则、外部工具与人工审批，将询盘、报价、贸易物流和客户跟进连接成可执行工作流。</span></p></div>
+ <div class="stats"><div class="stat"><b>5</b><span>Active Agents</span></div><div class="stat"><b>2</b><span>Planned Agents</span></div><div class="stat"><b>RAG</b><span>Enterprise Knowledge</span></div><div class="stat"><b>HITL</b><span>Human-in-the-loop</span></div></div>
+ <div class="flow"><span>Customer Inquiry</span><span class="arrow">→</span><span>Intent Router</span><span class="arrow">→</span><span>Knowledge / Pricing / Trade Tools</span><span class="arrow">→</span><span>Decision Support</span><span class="arrow">→</span><span>Human Approval</span></div>
+ <div class="cards">
+  <div class="card agent" onclick="show('sales')"><div class="icon">◎</div><h3>Sales Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="识别海外客户意图，编排产品、报价与贸易能力，形成下一步销售动作和回复草稿。" data-en="Understands overseas buyer intent, orchestrates product, quotation and trade capabilities, and recommends the next sales action with a reply draft.">识别海外客户意图，编排产品、报价与贸易能力，形成下一步销售动作和回复草稿。</span></p></div>
+  <div class="card agent" onclick="show('quote')"><div class="icon">¥</div><h3>Quotation Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="基于SKU、数量、包装和贸易条款辅助生成 EXW / FOB / CIF / DDP 报价结构。" data-en="Builds EXW / FOB / CIF / DDP quotation structures based on SKU, quantity, packaging and commercial terms.">基于SKU、数量、包装和贸易条款辅助生成 EXW / FOB / CIF / DDP 报价结构。</span></p></div>
+  <div class="card agent" onclick="show('trade')"><div class="icon">⇄</div><h3>Trade & Logistics Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="比较运输方案，识别清关、税费、进口主体与目的国贸易风险，并要求权威数据核验。" data-en="Compares shipping options and identifies customs, tax, importer and destination-market risks with authoritative-data verification.">比较运输方案，识别清关、税费、进口主体与目的国贸易风险，并要求权威数据核验。</span></p></div>
+  <div class="card agent" onclick="show('follow')"><div class="icon">◷</div><h3>Customer Follow-up Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="根据客户阶段、最后联系时间和历史动作生成跟进优先级与下一步沟通建议。" data-en="Uses opportunity stage, last-contact time and interaction history to prioritize follow-up and recommend the next best action.">根据客户阶段、最后联系时间和历史动作生成跟进优先级与下一步沟通建议。</span></p></div>
+  <div class="card agent" onclick="show('knowledge')"><div class="icon">◇</div><h3>Product Knowledge Agent</h3><span class="tag">ACTIVE</span><p><span data-zh="模拟企业RAG知识库，对产品、面料、包装、质保、认证和恢复时间进行检索式问答。" data-en="Simulates an enterprise RAG knowledge base for grounded Q&A across products, fabrics, packaging, warranty, compliance and recovery guidance.">模拟企业RAG知识库，对产品、面料、包装、质保、认证和恢复时间进行检索式问答。</span></p></div>
+  <div class="card agent"><div class="icon">✦</div><h3>Marketing & SEO Agent</h3><span class="tag soon">COMING SOON</span><p><span data-zh="从产品资料自动生成B2B产品页、SEO元数据、社媒内容和销售素材。" data-en="Generates B2B product pages, SEO metadata, social content and sales assets from product information.">从产品资料自动生成B2B产品页、SEO元数据、社媒内容和销售素材。</span></p></div>
+  <div class="card agent"><div class="icon">▦</div><h3>Management Insight Agent</h3><span class="tag soon">COMING SOON</span><p><span data-zh="未来连接CRM/ERP/网站数据，回答询盘、转化、产品热度和客户跟进等经营问题。" data-en="Future integration with CRM, ERP and web data for management insights across leads, conversion, product demand and follow-up.">未来连接CRM/ERP/网站数据，回答询盘、转化、产品热度和客户跟进等经营问题。</span></p></div>
+ </div>
+ <div class="footer"><span data-zh="匿名化演示环境：不包含真实制造商、品牌或客户身份。当前版本用于验证 Agent 场景、流程与交互；实时税率、库存、运价等生产数据需通过授权API或企业系统获取。" data-en="Anonymized demo environment: no real manufacturer, brand or customer identity is included. This prototype validates agent scenarios, workflows and interactions; real-time tariffs, inventory and freight rates require authorized APIs or enterprise systems.">匿名化演示环境：不包含真实制造商、品牌或客户身份。当前版本用于验证 Agent 场景、流程与交互；实时税率、库存、运价等生产数据需通过授权API或企业系统获取。</span></div>
+</section>
+
+<section id="sales" class="page">
+ <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Orchestrator Agent</div><h1>Sales Agent</h1>
+ <div class="flow"><span>Inquiry</span><span class="arrow">→</span><span>Intent</span><span class="arrow">→</span><span>Knowledge</span><span class="arrow">→</span><span>Quotation</span><span class="arrow">→</span><span>Trade</span><span class="arrow">→</span><span>Human Review</span></div>
+ <div class="workspace">
+  <div class="panel"><h2>Customer Inquiry</h2><textarea id="salesInput">Hello, we would like to order 2 sample sofas for showroom testing. Please quote CIF Mersin, Türkiye. We prefer high-elasticity fabric and need the fire-retardant test report.</textarea><button class="btn primary" onclick="salesRun()">Run Agent</button></div>
+  <div class="panel"><h2>Agent Analysis</h2><div id="salesOut" class="output">Waiting for inquiry...</div></div>
+  <div class="panel"><h2>Agent Routing</h2><div class="kv"><div class="k">Knowledge Agent</div><div class="v">Product / Fabric / Certification</div><div class="k">Quotation Agent</div><div class="v">Sample price / Incoterm</div><div class="k">Trade Agent</div><div class="v">CIF / Customs / Tax risk</div><div class="k">Approval</div><div class="v">Required before external commitment</div></div></div>
+  <div class="panel"><h2>Generated Reply</h2><div id="salesMail" class="output">Run the agent to generate a draft.</div><div class="sep"><button class="btn primary" onclick="alert('Demo: approved. Production version would create a CRM/email draft.')">Approve Draft</button> <button class="btn secondary" onclick="alert('Escalated to human sales manager.')">Human Review</button></div></div>
+ </div>
+</section>
+
+<section id="quote" class="page">
+ <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Business Rule Agent</div><h1>Quotation Agent</h1>
+ <div class="workspace">
+  <div class="panel"><h2>Quotation Inputs</h2>
+   <label>Quantity</label><input id="qty" type="number" value="2">
+   <label>EXW unit price (RMB)</label><input id="exw" type="number" value="1260">
+   <label>Incoterm</label><select id="term"><option>EXW</option><option>FOB</option><option selected>CIF</option><option>DDP</option></select>
+   <label>Estimated logistics/export charges (RMB)</label><input id="logi" type="number" value="1266">
+   <button class="btn primary" onclick="quoteRun()">Generate Structure</button>
+  </div>
+  <div class="panel"><h2>Pricing Decision Support</h2><div id="quoteOut" class="output">Waiting for inputs...</div></div>
+ </div>
+ <div class="panel" style="margin-top:14px"><div class="notice"><b>Control:</b> Demo calculates a quotation structure only. Margin policy, final freight, insurance, duty/VAT and contractual commitments require authorized data and human approval.</div></div>
+</section>
+
+<section id="trade" class="page">
+ <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">External Tool Agent</div><h1>Trade & Logistics Agent</h1>
+ <div class="workspace">
+  <div class="panel"><h2>Shipment</h2><div class="kv"><div class="k">Destination</div><div class="v">Mersin, Türkiye</div><div class="k">Cartons</div><div class="v">2</div><div class="k">Carton Size</div><div class="v">50 × 50 × 100 cm</div><div class="k">Gross Weight</div><div class="v">62 kg</div><div class="k">Requested Term</div><div class="v">CIF</div></div><div class="sep"><button class="btn primary" onclick="tradeRun()">Assess Trade Risk</button></div></div>
+  <div class="panel"><h2>Agent Assessment</h2><div id="tradeOut" class="output">Waiting for assessment...</div></div>
+  <div class="panel"><h2>Shipping Options</h2><table><tr><th>Mode</th><th>Use Case</th><th>Status</th></tr><tr><td>Sea LCL</td><td>Cost-oriented sample shipment</td><td>Compare</td></tr><tr><td>Express</td><td>Time-oriented samples</td><td>Compare</td></tr><tr><td>Air Freight</td><td>Urgent / larger samples</td><td>Optional</td></tr></table></div>
+  <div class="panel"><h2>Production Data Sources</h2><div class="kv"><div class="k">HS / Tariff</div><div class="v">Customs / official trade source</div><div class="k">Freight</div><div class="v">Forwarder API / quotation</div><div class="k">FX</div><div class="v">Authorized rate source</div><div class="k">Customer</div><div class="v">CRM / tax ID / consignee data</div></div></div>
+ </div>
+</section>
+
+<section id="follow" class="page">
+ <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">CRM Agent</div><h1>Customer Follow-up Agent</h1>
+ <div class="workspace">
+  <div class="panel"><h2>Opportunity Snapshot</h2><div class="kv"><div class="k">Customer</div><div class="v">Overseas Buyer #001</div><div class="k">Stage</div><div class="v">Sample Quotation</div><div class="k">Last Action</div><div class="v">Quotation + fabric options sent</div><div class="k">Last Contact</div><div class="v">7 days ago</div><div class="k">Response</div><div class="v">No reply</div></div><div class="sep"><button class="btn primary" onclick="followRun()">Recommend Action</button></div></div>
+  <div class="panel"><h2>Next Best Action</h2><div id="followOut" class="output">Waiting for CRM analysis...</div></div>
+ </div>
+</section>
+
+<section id="knowledge" class="page">
+ <button class="back" onclick="show('home')">← Agent Center</button><div class="eyebrow">Enterprise RAG Prototype</div><h1>Product Knowledge Agent</h1>
+ <div class="workspace">
+  <div class="panel"><h2>Ask Enterprise Knowledge</h2><input id="kbq" value="Can this compression sofa use high-elastic fabric?"><button class="btn primary" onclick="kbRun()">Retrieve & Answer</button><div class="sep"><small style="color:#71717a">Try: warranty / recovery / fire-retardant / carton / fabric</small></div></div>
+  <div class="panel"><h2>RAG Answer</h2><div id="kbOut" class="output">Waiting for query...</div></div>
+  <div class="panel"><h2>Knowledge Sources</h2><table><tr><th>Collection</th><th>Examples</th></tr><tr><td>Product Master</td><td>SKU, dimensions, CBM, weight</td></tr><tr><td>Materials</td><td>Chenille, bouclé, high-elastic fabric</td></tr><tr><td>Commercial</td><td>MOQ, lead time, warranty</td></tr><tr><td>Compliance</td><td>Test reports, certification</td></tr></table></div>
+  <div class="panel"><h2>RAG Guardrail</h2><div class="notice">If knowledge retrieval has insufficient evidence, the agent should answer “factory confirmation required” rather than fabricate product or compliance facts.</div></div>
+ </div>
+</section>
+
+</main></div>
+<script>
+
+let currentLang='zh';
+const titleMap={
+ zh:{home:'AI Agent Center',sales:'Sales Agent',quote:'Quotation Agent',trade:'Trade & Logistics Agent',follow:'Customer Follow-up Agent',knowledge:'Product Knowledge Agent'},
+ en:{home:'AI Agent Center',sales:'Sales Agent',quote:'Quotation Agent',trade:'Trade & Logistics Agent',follow:'Customer Follow-up Agent',knowledge:'Product Knowledge Agent'}
+};
+function setLang(lang){
+ currentLang=lang;
+ document.documentElement.lang=lang==='zh'?'zh-CN':'en';
+ document.getElementById('zhBtn').classList.toggle('on',lang==='zh');
+ document.getElementById('enBtn').classList.toggle('on',lang==='en');
+ document.querySelectorAll('[data-zh][data-en]').forEach(el=>el.textContent=el.dataset[lang]);
+ // Translate common interface labels without changing business data
+ const dict={
+  'Customer Inquiry':['客户询盘','Customer Inquiry'],'Agent Analysis':['智能体分析','Agent Analysis'],
+  'Agent Routing':['智能体路由','Agent Routing'],'Generated Reply':['自动生成回复','Generated Reply'],
+  'Quotation Inputs':['报价输入','Quotation Inputs'],'Pricing Decision Support':['报价决策支持','Pricing Decision Support'],
+  'Shipment':['运输信息','Shipment'],'Agent Assessment':['智能体评估','Agent Assessment'],
+  'Shipping Options':['运输方案','Shipping Options'],'Production Data Sources':['生产数据源','Production Data Sources'],
+  'Opportunity Snapshot':['商机概览','Opportunity Snapshot'],'Next Best Action':['下一步最佳行动','Next Best Action'],
+  'Ask Enterprise Knowledge':['查询企业知识库','Ask Enterprise Knowledge'],'RAG Answer':['RAG 检索回答','RAG Answer'],
+  'Knowledge Sources':['知识来源','Knowledge Sources'],'RAG Guardrail':['RAG 安全边界','RAG Guardrail']
+ };
+ document.querySelectorAll('h2').forEach(el=>{
+   for(const [en,[zhv,env]] of Object.entries(dict)){
+     if(el.textContent===en||el.textContent===zhv) el.textContent=lang==='zh'?zhv:env;
+   }
+ });
+ document.querySelectorAll('.back').forEach(el=>el.textContent=lang==='zh'?'← 返回智能体中心':'← Agent Center');
+}
+
+function show(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');window.scrollTo(0,0)}
+function salesRun(){
+ let t=document.getElementById('salesInput').value.toLowerCase();
+ let country=(t.includes('türkiye')||t.includes('turkey'))?'Türkiye':'Needs detection';
+ let term=t.includes('cif')?'CIF':t.includes('ddp')?'DDP':t.includes('fob')?'FOB':'Needs confirmation';
+ document.getElementById('salesOut').textContent=`INTENT CLASSIFICATION\n• Market: ${country}\n• Buyer: B2B / showroom buyer\n• Intent: Sample order + quotation\n• Quantity: 2 pcs\n• Incoterm: ${term}\n• Requirements: high-elastic fabric, fire-retardant report\n\nAGENT ROUTING\n✓ Product Knowledge Agent\n✓ Quotation Agent\n✓ Trade & Logistics Agent\n\nRISK GATE\nFinal price, tax/duty, HS classification and delivery commitment → HUMAN APPROVAL`;
+ document.getElementById('salesMail').textContent=`Dear Purchasing Team,\n\nThank you for your inquiry. We can arrange 2 sample sofas for showroom testing and provide high-elasticity fabric options together with the available fire-retardant test documentation.\n\nFor the requested CIF shipment to Mersin, we will prepare the quotation based on the confirmed product configuration and current logistics cost.\n\nBefore final confirmation, please provide the consignee company information, tax ID and confirm customs-clearance capability in Türkiye. Import duty, VAT and destination clearance charges will be verified separately according to the applicable rules.\n\nBest regards,\nExport Sales Team`;
+}
+function quoteRun(){
+ let q=+document.getElementById('qty').value,e=+document.getElementById('exw').value,l=+document.getElementById('logi').value,term=document.getElementById('term').value;
+ let goods=q*e,total=goods+(term==='EXW'?0:l);
+ document.getElementById('quoteOut').textContent=`QUOTATION STRUCTURE\nIncoterm: ${term}\nQuantity: ${q}\nGoods: ¥${goods.toLocaleString()}\nEstimated logistics/export charges: ¥${term==='EXW'?0:l.toLocaleString()}\n--------------------------------\nIndicative subtotal: ¥${total.toLocaleString()}\n\nAgent note:\n${term==='CIF'?'CIF requires confirmed freight + insurance. Destination import duty/VAT and customs clearance are normally handled separately unless contractually agreed.':term==='DDP'?'DDP requires verified duty/tax, customs responsibility and last-mile delivery cost before commitment.':'Final commercial terms require approval.'}`;
+}
+function tradeRun(){document.getElementById('tradeOut').textContent=`RISK ASSESSMENT\n\n1. Consignee / Importer → VERIFY\nConfirm legal entity, tax ID and import/customs-clearance capability.\n\n2. HS Classification → HUMAN + AUTHORITATIVE SOURCE\nDo not rely on LLM memory for final customs classification.\n\n3. Duty / VAT → REAL-TIME VERIFICATION\nRetrieve current official tariff and tax information before quotation commitment.\n\n4. CIF Responsibility → CONFIRM\nClarify seller/buyer cost boundary and destination charges.\n\n5. Logistics → COMPARE\nCompare LCL vs express based on current forwarder quotation.\n\nOverall status: ⚠ HUMAN REVIEW REQUIRED`; }
+function followRun(){document.getElementById('followOut').textContent=`OPPORTUNITY SIGNAL\nStage: Sample quotation\nSilence: 7 days\nRisk: Opportunity cooling / internal buyer review unknown\nPriority: Medium-High\n\nNEXT BEST ACTION\nSend a concise value-based follow-up today. Avoid immediate discounting. Ask whether product, fabric, logistics or internal approval is blocking the next step.\n\nDRAFT\nDear Customer,\n\nJust following up on the sample quotation and fabric options shared earlier. Please let us know if you need any additional product, logistics or certification information for your internal evaluation. We will be glad to support the next step.\n\nBest regards,\nExport Sales Team`; }
+function kbRun(){
+ let q=document.getElementById('kbq').value.toLowerCase(),a='';
+ if(q.includes('warranty')) a='Retrieved: Commercial Policy → Standard warranty: 3 years. Final scope is subject to the sales contract.';
+ else if(q.includes('recover')) a='Retrieved: Product Handling Guide → Compression products begin rapid recovery after unpacking; full recovery is generally expected within 24–72 hours depending on product and environment.';
+ else if(q.includes('fire')) a='Retrieved: Compliance Collection → Fire-retardant test documentation is available for applicable materials/products. Match the exact report to the ordered configuration before sending.';
+ else if(q.includes('carton')) a='Retrieved: Product Master → Demo sample carton: 50 × 50 × 100 cm; gross weight: 31 kg/ctn.';
+ else if(q.includes('fabric')||q.includes('elastic')) a='Retrieved: Material Compatibility → High-elasticity fabric is available for the demo compression sofa configuration. Exact color/material combination should be confirmed before production.';
+ else a='No sufficiently grounded knowledge retrieved. → Factory confirmation required. The agent will not fabricate an answer.';
+ document.getElementById('kbOut').textContent=`QUERY\n${document.getElementById('kbq').value}\n\n${a}\n\nSource mode: Enterprise knowledge retrieval (demo)`;
+}
+setLang('zh');
+</script>
+</body></html>
